@@ -1,15 +1,15 @@
-set.seed(1234)                    # for replicability
-
 reps = 10                         # Number of outer-loop repetitions
-methods = c("BH", "Focused_BH",   # methods
+methods = c("BH",                 # methods
+            "Focused_BH_original",   
+            "Focused_BH_permutation",
             "Structured_Holm")
 q = 0.1                           # FDR control level
 signal_strength_vals = c(1,2,3)
 
-nonnull_genes = 1:50
+# nonnull_genes = 1:50
 
-k_max = 350  # maximum number of rejections considered
-B = 100      # number of repetitions
+t_max = 0.02  # maximum p-value threshold considered by permutation approach
+B = 100       # number of repetitions
 
 filter_name = "REVIGO"
 # base_log_odds = qlogis(0.05)
@@ -50,7 +50,11 @@ for(id in ids){
   adj_matrix[sets[[id]],id] = TRUE
 }
 
+nonnull_genes = sample(genes, 50)
+nonnull_genes = 1:50
 nonnull_terms = colSums(adj_matrix[nonnull_genes,]) > 0  
+
+hist(colSums(adj_matrix[nonnull_genes,nonnull_terms]))
 
 parameters = tibble(signal_strength_vals)
 names(parameters) = "signal_strength"
@@ -62,3 +66,16 @@ if(exists("experiment_index")){
   # return number of parameters (for submission script)
   cat(nrow(parameters))  
 }
+
+# precomp_dir = sprintf("%s/precomp/%s", base_dir, experiment_name)
+# if(dir.exists(precomp_dir)){
+#   null_V_hats = vector("list", B)
+#   for(b in 1:B){
+#     precomp_filename = sprintf("%s/precomp/%s/precomp_%s_%d.tsv", 
+#             base_dir, experiment_name, experiment_name, b) 
+#     V_hat = read_tsv(precomp_filename, col_types = "dii")
+#     V_hat$b = b
+#     null_V_hats[[b]] = V_hat
+#   }
+#   null_V_hats = do.call("rbind", null_V_hats)
+# }

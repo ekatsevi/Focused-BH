@@ -34,11 +34,14 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   
   num_annotations = sapply(sets, length)
   
+  # for permutation method
+  gamma = function(t)(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
+  gamma_oracle = function(t)(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
+  
   for(rep in 1:reps){
     cat(sprintf("Working on repetition %d out of %d...\n", rep, reps))
     # problem setup
 
-    # DE_genes = rbinom(n = num_genes, size = 1, prob = gene_probabilities)
     DE_stats = beta + rnorm(num_genes)
     P_gene = pnorm(DE_stats, lower.tail = FALSE)
     P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
@@ -63,8 +66,11 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       selected["Structured_Holm",] = structuredHolm(G_SH, alpha_max = q, pvalues=P)@rejected
     }
         
-    # Focused BH
-    selected["Focused_BH",] = FocusedBH(filter_name, P, G, q)
+    # Focused BH (original)
+    selected["Focused_BH_original",] = FocusedBH(filter_name, P, G, q)
+    
+    # Focused BH (permutation)
+    selected["Focused_BH_permutation",] = FocusedBH(filter_name, P, G, q, gamma)
     
     # Filter the results
     for(method in methods){
@@ -77,7 +83,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",rep]))
     }
     
-
     # verbose option useful for interactive runs
     for(method in methods){
       cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",rep]))
@@ -86,20 +91,17 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   }
   df = melt(metrics)
   names(df) = c("method", "metric", "rep", "value")
-  df$SNR = SNR
-  df$rho = rho
+  df$signal_strength = signal_strength
   df = as_tibble(df)
   write_tsv(df, path = sprintf("%s/results/%s/metrics_%s_%d.tsv", base_dir, experiment_name, experiment_name, experiment_index))
 }
 
 run_one_precomputation = function(experiment_name, b, base_dir){
+  set.seed(1234+b) # for reproducibility
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
   source(input_filename, local = TRUE)
   
   num_annotations = sapply(sets, length)
-  
-  # V_hat = array(0, dim = c(2, 2, k_max, B), dimnames = list(c("pvalue", "V"), c("oracle", "permutation"), NULL, NULL))
-  V_hat = matrix(0, k_max, 3, dimnames = list(NULL, c("pvalue", "V_oracle", "V_permutation")))
   
   cat(sprintf("Generating null p-values...\n"))
   DE_stats = rnorm(num_genes)
@@ -107,8 +109,11 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
                                       df = 2*num_annotations[id], 
                                       lower.tail = FALSE)))
-  
   ord = order(P)
+  
+  k_max = sum(P <= t_max)
+  V_hat = matrix(0, k_max, 3, dimnames = list(NULL, c("pvalue", "V_oracle", "V_permutation")))
+  
   
   for(k in k_max:1){
     cat(sprintf("Considering rejection set of size %d...\n", k))
