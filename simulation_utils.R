@@ -122,5 +122,5 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   }
   write_tsv(as_tibble(V_hat), 
             path = sprintf("%s/precomp/%s/precomp_%s_%d.tsv", 
-                           base_dir, experiment_name, experiment_name, experiment_index))
+                           base_dir, experiment_name, experiment_name, b))
 }
