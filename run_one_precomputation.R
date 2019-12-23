@@ -7,6 +7,8 @@ b = as.integer(args[2])
 base_dir = args[3]
 machine = args[4]
 
+print(machine)
+
 source("setup.R", local = TRUE)
 
 # run the computation
