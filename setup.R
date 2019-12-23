@@ -1,5 +1,5 @@
 # paths
-print("machine")
+print(machine)
 
 if(machine == "local"){
   base_dir = "/home/ekatsevi/project-files/focused-bh"  
