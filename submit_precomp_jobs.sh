@@ -34,7 +34,7 @@ then
 mkdir $precomp_dir
 fi
 
-num_experiments=1
+num_experiments=100
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
   do
 echo "Submitting job for precomputation number "$experiment_index

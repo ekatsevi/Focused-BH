@@ -8,7 +8,7 @@ signal_strength_vals = c(1,2,3)
 
 nonnull_genes = 1:50
 
-k_max = 10 # maximum number of rejections considered
+k_max = 350  # maximum number of rejections considered
 B = 100      # number of repetitions
 
 filter_name = "REVIGO"
