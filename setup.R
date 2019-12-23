@@ -1,7 +1,10 @@
-rm(list = ls())
-
 # paths
-base_dir = "/home/ekatsevi/project-files/focused-bh" # local
+if(machine == "local"){
+  base_dir = "/home/ekatsevi/project-files/focused-bh"  
+}
+if(machine == "PSC"){
+  base_dir="/pylon5/ms5piap/ekatsevi/focused-bh"
+}
 
 # download data and run preprocessing
 system(sprintf("./download_GO_data.sh %s", base_dir))

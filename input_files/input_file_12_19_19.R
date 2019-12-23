@@ -1,3 +1,5 @@
+set.seed(1234)                    # for replicability
+
 reps = 10                         # Number of outer-loop repetitions
 methods = c("BH", "Focused_BH",   # methods
             "Structured_Holm")
