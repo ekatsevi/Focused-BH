@@ -28,7 +28,6 @@ if(exists("input_mode")){
   }
 } else{
   args = commandArgs(trailingOnly = TRUE)
-  print(args)
   num_args = length(args)
   stopifnot(num_args == 1)
   input_mode = args[1]
