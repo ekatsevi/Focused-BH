@@ -1,4 +1,4 @@
-library(tidyverse, quietly = TRUE)
+suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions

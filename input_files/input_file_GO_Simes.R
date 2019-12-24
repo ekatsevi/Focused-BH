@@ -1,4 +1,4 @@
-library(tidyverse, quietly = TRUE)
+suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions
@@ -17,8 +17,6 @@ names(parameters) = "signal_strength"
 
 ### set mode (experiment, precomputation, num_experiments, num_precomputations)
 args = commandArgs(trailingOnly = TRUE)
-print(args)
-cat(args)
 num_args = length(args)
 stopifnot(num_args <= 1)
 if(num_args == 0){
@@ -33,7 +31,7 @@ if(num_args == 0){
 }
 if(num_args == 1){
   mode = args[1]
-  cat(mode)
+  print(mode)
   stopifnot("mode" %in% c("num_experiments", "num_precomputations"))
   if(mode == "num_experiments"){
     cat(nrow(parameters))
