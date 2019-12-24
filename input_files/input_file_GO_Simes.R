@@ -20,7 +20,7 @@ names(parameters) = "signal_strength"
 print("At least I got here!")
 ### set mode (experiment, precomputation, num_experiments, num_precomputations)
 if(exists("mode")){
-  print("For some reason I got here...")
+  print(mode)
   stopifnot(mode %in% c("experiment", "precomputation"))
   if(mode == "experiment"){
     stopifnot(exists("experiment_index"))
