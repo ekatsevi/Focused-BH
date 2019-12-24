@@ -26,17 +26,21 @@ FocusedBH = function(filter_name, P, G, q, gamma = NULL){
   fdr_thresh = max(P[p.adjust(P, "fdr") <= q])
   k_start = sum(P <= fdr_thresh)
   
-  for(k in k_start:1){
-    cat(sprintf("Considering rejection set of size %d...\n", k))
-    R = logical(m)
-    R[ord[1:k]] = TRUE
-    R_F = run_filter(P, R, G, filter_name)
-    FDP_hat = gamma(P[ord[k]])/sum(R_F)
-    if(FDP_hat <= q){
-      return(R)
+  if(k_start == 0){
+    return(logical(m))
+  } else{
+    for(k in k_start:1){
+      cat(sprintf("Considering rejection set of size %d...\n", k))
+      R = logical(m)
+      R[ord[1:k]] = TRUE
+      R_F = run_filter(P, R, G, filter_name)
+      FDP_hat = gamma(P[ord[k]])/sum(R_F)
+      if(FDP_hat <= q){
+        return(R)
+      }
     }
+    return(logical(m))
   }
-  return(logical(m))
 }
 
 run_filter = function(P, R, G, filter_name){
@@ -54,6 +58,7 @@ run_filter = function(P, R, G, filter_name){
     names(df_output) = matrix_output[1,]
     R_F = R
     R_F[which(R_F)] = df_output$eliminated == 0
+    
     return(R_F)
   }
 }

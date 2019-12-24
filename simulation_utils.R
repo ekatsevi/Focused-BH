@@ -17,12 +17,10 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
                   dimnames = list(methods, c("power", "fdp"), NULL))
 
   # create set of non-nulls genes
-  delta = 0
   beta = numeric(num_genes)
+  names(beta) = genes
   beta[nonnull_genes] = signal_strength
 
-  num_annotations = sapply(sets, length)
-  
   # for permutation method
   if("Focused_BH_permutation" %in% methods){
     # load precomputation results
@@ -31,9 +29,9 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     precomp_files = list.files(precomp_dir)
     B = length(precomp_files)
     stopifnot(B > 0)
-    null_V_hats = vector("list", length())
+    null_V_hats = vector("list", B)
     for(b in 1:B){
-        V_hat = read_tsv(precomp_files[b], col_types = "dii")
+        V_hat = read_tsv(sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b]), col_types = "dii")
         V_hat$b = b
         null_V_hats[[b]] = V_hat
     }
@@ -70,7 +68,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
                                           lower.tail = FALSE)))
     }
     if(global_test == "Simes"){
-      P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations/(1:num_annotations))))
+      P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations[id]/(1:num_annotations[id]))))
     }
     
     ### Run all methods ###
@@ -99,7 +97,8 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     
     # Focused BH (permutation)
     if("Focused_BH_permutation" %in% methods){
-      rejections["Focused_BH_permutation",] = FocusedBH(filter_name, P, G, q, V_hat_permutation)      
+      rejections["Focused_BH_permutation",] = FocusedBH(
+        filter_name, P, G, q, V_hat_permutation)
     }
     
     # Focused BH (oracle)
@@ -144,7 +143,6 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   }
   ord = order(P)
   
-  k_max = sum(P <= t_max)
   V_hat = matrix(0, k_max, 3, dimnames = list(NULL, c("pvalue", "V_oracle", "V_permutation")))
   
   for(k in k_max:1){

@@ -1,16 +1,16 @@
 suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
-reps = 10                         # Number of outer-loop repetitions
+reps = 2                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
             "Focused_BH_oracle",
             "Structured_Holm")
 q = 0.1                           # FDR control level
-signal_strength_vals = c(1,2,3)
+signal_strength_vals = c(1,2,3,4,5)
 global_test = "Simes"
-t_max = 0.02  # maximum p-value threshold considered by permutation approach
+k_max = 350  # maximum p-value threshold considered by permutation approach
 B = 100       # number of repetitions
 filter_name = "REVIGO"
 parameters = tibble(signal_strength_vals)
@@ -21,6 +21,7 @@ if(exists("input_mode")){
   stopifnot(input_mode %in% c("experiment", "precomputation"))
   if(input_mode == "experiment"){
     stopifnot(exists("experiment_index"))
+    signal_strength = parameters$signal_strength[experiment_index]
   }
   if(input_mode == "precomputation"){
     stopifnot(exists("b"))
@@ -48,8 +49,14 @@ if(input_mode %in% c("precomputation", "experiment")){
   reduced_graph_file = sprintf("%s/data/processed/reduced_graph.Rda", base_dir)
   load(reduced_graph_file)
   
-  ids = names(G$gene_sets)
+  gene_sets = G$gene_sets
+  to_remove = names(which(sapply(G$gene_sets, length) > 100))
+  G = subset_graph(to_remove, G)
+  ids = names(G$C)
   m = length(ids)
+  gene_sets = gene_sets[ids]
+  num_annotations = sapply(gene_sets, length)
+  
   index = c()
   for(i in 1:m){
     index[[ids[i]]] = i
@@ -57,9 +64,7 @@ if(input_mode %in% c("precomputation", "experiment")){
   
   parents_indexed = sapply(G$Pa, function(parents_list)(unname(index[parents_list])))
   children_indexed = sapply(G$C, function(children_list)(unname(index[children_list])))
-  sets = G$gene_sets
-  num_annotations = sapply(sets, length)
-  
+
   G = c()
   G$m = m
   G$Pa = parents_indexed
@@ -71,7 +76,7 @@ if(input_mode %in% c("precomputation", "experiment")){
                children = children_indexed, sets = sets, twoway = FALSE)
   }
   
-  genes = unique(unlist(sets))
+  genes = unique(unlist(gene_sets))
   num_genes = length(genes)
   adj_matrix = matrix(FALSE, num_genes, m)
   rownames(adj_matrix) = genes
@@ -80,14 +85,15 @@ if(input_mode %in% c("precomputation", "experiment")){
     adj_matrix[sets[[id]],id] = TRUE
   }
   
-  anchor_terms = withSeed(sample(which(num_annotations == 5), 4), 1)
-  nonnull_genes = unique(unlist(lapply(sets[anchor_terms], function(set)(set))))
-  nonnull_terms = colSums(adj_matrix[nonnull_genes,]) > 0  
+  anchor_terms = withSeed(sample(which(num_annotations == 5), 3), 1)
+  nonnull_genes = unique(unlist(lapply(gene_sets[anchor_terms], function(set)(set))))
+  nonnull_terms = colSums(adj_matrix[nonnull_genes,]) > 0
   
+  # sum(nonnull_terms)
   # mean(nonnull_terms)
   # P = numeric(m)
-  # P[!nonnull_terms] = 1
-  # R_F = run_filter(P, nonnull_terms, G, "REVIGO")
+  # P[!nonnull_terms | num_annotations > 100] = 1
+  # R_F = run_filter(P, nonnull_terms & num_annotations <= 100, G, "REVIGO")
   # hist(colSums(adj_matrix[nonnull_genes,nonnull_terms]), breaks = 10)
   # hist(colSums(adj_matrix[nonnull_genes,nonnull_terms])/colSums(adj_matrix[,nonnull_terms]), breaks = 20)
 }
