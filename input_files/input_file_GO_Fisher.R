@@ -57,6 +57,7 @@ if(mode %in% c("precomputation", "experiment")){
   parents_indexed = sapply(G$Pa, function(parents_list)(unname(index[parents_list])))
   children_indexed = sapply(G$C, function(children_list)(unname(index[children_list])))
   sets = G$gene_sets
+  num_annotations = sapply(sets, length)
   
   G = c()
   G$m = m

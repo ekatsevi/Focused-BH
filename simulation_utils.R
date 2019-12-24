@@ -131,8 +131,6 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   mode = "precomputation"
   source(input_filename, local = TRUE)
   
-  num_annotations = sapply(sets, length)
-  
   cat(sprintf("Generating null p-values...\n"))
   DE_stats = rnorm(num_genes)
   P_gene = pnorm(DE_stats, lower.tail = FALSE)

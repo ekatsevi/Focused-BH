@@ -59,13 +59,14 @@ if(mode %in% c("precomputation", "experiment")){
   parents_indexed = sapply(G$Pa, function(parents_list)(unname(index[parents_list])))
   children_indexed = sapply(G$C, function(children_list)(unname(index[children_list])))
   sets = G$gene_sets
+  num_annotations = sapply(sets, length)
   
   G = c()
   G$m = m
   G$Pa = parents_indexed
   G$C = children_indexed
   
-  if("Structured_Holm" %in% methods){
+  if("Structured_Holm" %in% methods & mode == "experiment"){
     cat(sprintf("Creating DAG for Structured Holm...\n"))
     G_SH = new("DAGstructure", parents = parents_indexed, 
                children = children_indexed, sets = sets, twoway = FALSE)
