@@ -73,7 +73,7 @@ if(input_mode %in% c("precomputation", "experiment")){
   if("Structured_Holm" %in% methods & input_mode == "experiment"){
     cat(sprintf("Creating DAG for Structured Holm...\n"))
     G_SH = new("DAGstructure", parents = parents_indexed, 
-               children = children_indexed, sets = sets, twoway = FALSE)
+               children = children_indexed, sets = gene_sets, twoway = FALSE)
   }
   
   genes = unique(unlist(gene_sets))
@@ -82,7 +82,7 @@ if(input_mode %in% c("precomputation", "experiment")){
   rownames(adj_matrix) = genes
   colnames(adj_matrix) = ids
   for(id in ids){
-    adj_matrix[sets[[id]],id] = TRUE
+    adj_matrix[gene_sets[[id]],id] = TRUE
   }
   
   anchor_terms = withSeed(sample(which(num_annotations == 5), 3), 1)
