@@ -11,15 +11,15 @@ system(sprintf("./download_GO_data.sh %s", base_dir))
 source("parse_GO_files.R")
 
 # libraries
-library(readxl, quietly = TRUE)
-library(ontologyIndex, quietly = TRUE)
-library(qvalue, quietly = TRUE)
-library(cherry, quietly = TRUE)      # to run the Structured Holm procedure (Meijer and Goeman, 2015b)
-library(structSSI, quietly = TRUE)   # to perform Yekutieli test
-library(igraph, quietly = TRUE)      # to perform Yekutieli test
-library(ape, quietly = TRUE)         # to perform Yekutieli test
-library(R.utils, quietly = TRUE)
-library(reshape2, quietly = TRUE)
+suppressPackageStartupMessages(library(readxl))
+suppressPackageStartupMessages(library(ontologyIndex))
+suppressPackageStartupMessages(library(qvalue))
+suppressPackageStartupMessages(library(cherry))      # to run the Structured Holm procedure (Meijer and Goeman, 2015b)
+suppressPackageStartupMessages(library(structSSI))   # to perform Yekutieli test
+suppressPackageStartupMessages(library(igraph))      # to perform Yekutieli test
+suppressPackageStartupMessages(library(ape))         # to perform Yekutieli test
+suppressPackageStartupMessages(library(R.utils))
+suppressPackageStartupMessages(library(reshape2))
 suppressPackageStartupMessages(library(tidyverse))
 
 # auxiliary functions

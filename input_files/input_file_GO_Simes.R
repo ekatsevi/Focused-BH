@@ -5,14 +5,13 @@ reps = 10                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
+            "Focused_BH_oracle",
             "Structured_Holm")
 q = 0.1                           # FDR control level
 signal_strength_vals = c(1,2,3)
 global_test = "Simes"
-# t_max = 0.02  # maximum p-value threshold considered by permutation approach
-# B = 100       # number of repetitions
-t_max = 0.001  # maximum p-value threshold considered by permutation approach
-B = 1         # number of repetitions
+t_max = 0.02  # maximum p-value threshold considered by permutation approach
+B = 100       # number of repetitions
 filter_name = "REVIGO"
 parameters = tibble(signal_strength_vals)
 names(parameters) = "signal_strength"
