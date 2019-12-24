@@ -140,7 +140,7 @@ run_one_precomputation = function(experiment_name, b, base_dir){
                                         lower.tail = FALSE)))
   }
   if(global_test == "Simes"){
-    P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations/(1:num_annotations))))
+    P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations[id]/(1:num_annotations[id]))))
   }
   ord = order(P)
   
