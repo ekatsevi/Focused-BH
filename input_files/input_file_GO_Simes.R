@@ -28,6 +28,7 @@ if(exists("mode")){
   }
 } else{
   args = commandArgs(trailingOnly = TRUE)
+  print(args)
   num_args = length(args)
   stopifnot(num_args != 1)
   mode = args[1]
