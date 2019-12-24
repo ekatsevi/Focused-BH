@@ -17,8 +17,10 @@ filter_name = "REVIGO"
 parameters = tibble(signal_strength_vals)
 names(parameters) = "signal_strength"
 
+print("At least I got here!")
 ### set mode (experiment, precomputation, num_experiments, num_precomputations)
 if(exists("mode")){
+  print("For some reason I got here...")
   stopifnot(mode %in% c("experiment", "precomputation"))
   if(mode == "experiment"){
     stopifnot(exists("experiment_index"))
@@ -27,7 +29,7 @@ if(exists("mode")){
     stopifnot(exists("b"))
   }
 } else{
-  print("In num mode")
+  print("I am in the right place!")
   args = commandArgs(trailingOnly = TRUE)
   print(args)
   num_args = length(args)
