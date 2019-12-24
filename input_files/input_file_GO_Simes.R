@@ -1,4 +1,4 @@
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions
@@ -17,6 +17,8 @@ names(parameters) = "signal_strength"
 
 ### set mode (experiment, precomputation, num_experiments, num_precomputations)
 args = commandArgs(trailingOnly = TRUE)
+print(args)
+cat(args)
 num_args = length(args)
 stopifnot(num_args <= 1)
 if(num_args == 0){

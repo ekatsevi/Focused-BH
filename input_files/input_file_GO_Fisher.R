@@ -1,4 +1,4 @@
-library(tidyverse)
+library(tidyverse, quietly = TRUE)
 
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions
