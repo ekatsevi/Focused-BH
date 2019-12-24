@@ -34,7 +34,7 @@ then
 mkdir $precomp_dir
 fi
 
-num_experiments=$(Rscript $input_filename num_precomputations)
+num_experiments=$(Rscript $input_filename "num_precomputations")
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
   do
 echo "Submitting job for precomputation number "$experiment_index
