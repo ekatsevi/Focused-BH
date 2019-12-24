@@ -8,7 +8,7 @@ reduced_graph_file = sprintf("%s/data/processed/reduced_graph.Rda", base_dir)
 reduced_graph_50_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)
 
 if(file.exists(annotations_file) & file.exists(reduced_graph_file)){
-  cat(sprintf("GO files already parsed!"))
+#  cat(sprintf("GO files already parsed!"))
 } else{
 ontology_raw = get_ontology(ontology_file, 
                         propagate_relationships = c("is_a", "part_of"), 

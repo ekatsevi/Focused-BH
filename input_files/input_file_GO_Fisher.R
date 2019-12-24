@@ -1,3 +1,5 @@
+source("setup.R")
+
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
