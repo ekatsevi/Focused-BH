@@ -3,7 +3,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   
   # set up all the simulation parameters
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
-  mode = "experiment"
+  input_mode = "experiment"
   source(input_filename, local = TRUE)
   
   cat(sprintf("Starting simulation with signal strength = %0.1f...\n", signal_strength))
@@ -128,7 +128,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
 run_one_precomputation = function(experiment_name, b, base_dir){
   set.seed(1234+b) # for reproducibility; should be different for different b
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
-  mode = "precomputation"
+  input_mode = "precomputation"
   source(input_filename, local = TRUE)
   
   cat(sprintf("Generating null p-values...\n"))

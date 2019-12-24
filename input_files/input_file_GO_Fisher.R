@@ -15,31 +15,31 @@ filter_name = "REVIGO"
 parameters = tibble(signal_strength_vals)
 names(parameters) = "signal_strength"
 
-### set mode (experiment, precomputation, num_experiments, num_precomputations)
-if(exists("mode")){
-  stopifnot(mode %in% c("experiment", "precomputation"))
-  if(mode == "experiment"){
+### set input_mode (experiment, precomputation, num_experiments, num_precomputations)
+if(exists("input_mode")){
+  stopifnot(input_mode %in% c("experiment", "precomputation"))
+  if(input_mode == "experiment"){
     stopifnot(exists("experiment_index"))
   }
-  if(mode == "precomputation"){
+  if(input_mode == "precomputation"){
     stopifnot(exists("b"))
   }
 } else{
   args = commandArgs(trailingOnly = TRUE)
   num_args = length(args)
   stopifnot(num_args != 1)
-  mode = args[1]
-  stopifnot(mode %in% c("num_experiments", "num_precomputations"))
-  if(mode == "num_experiments"){
+  input_mode = args[1]
+  stopifnot(input_mode %in% c("num_experiments", "num_precomputations"))
+  if(input_mode == "num_experiments"){
     cat(nrow(parameters))
   }
-  if(mode == "num_precomputations"){
+  if(input_mode == "num_precomputations"){
     cat(B)
   }
 }
 
 ### define the graph
-if(mode %in% c("precomputation", "experiment")){
+if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
   cat(sprintf("Reading in GO data...\n"))
   # reduced_graph_50_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)

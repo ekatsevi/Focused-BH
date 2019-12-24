@@ -18,14 +18,14 @@ parameters = tibble(signal_strength_vals)
 names(parameters) = "signal_strength"
 
 print("At least I got here!")
-### set mode (experiment, precomputation, num_experiments, num_precomputations)
-if(exists("mode")){
-  print(mode)
-  stopifnot(mode %in% c("experiment", "precomputation"))
-  if(mode == "experiment"){
+### set input_mode (experiment, precomputation, num_experiments, num_precomputations)
+if(exists("input_mode")){
+  print(input_mode)
+  stopifnot(input_mode %in% c("experiment", "precomputation"))
+  if(input_mode == "experiment"){
     stopifnot(exists("experiment_index"))
   }
-  if(mode == "precomputation"){
+  if(input_mode == "precomputation"){
     stopifnot(exists("b"))
   }
 } else{
@@ -34,18 +34,18 @@ if(exists("mode")){
   print(args)
   num_args = length(args)
   stopifnot(num_args != 1)
-  mode = args[1]
-  stopifnot(mode %in% c("num_experiments", "num_precomputations"))
-  if(mode == "num_experiments"){
+  input_mode = args[1]
+  stopifnot(input_mode %in% c("num_experiments", "num_precomputations"))
+  if(input_mode == "num_experiments"){
     cat(nrow(parameters))
   }
-  if(mode == "num_precomputations"){
+  if(input_mode == "num_precomputations"){
     cat(B)
   }
 }
 
 ### define the graph
-if(mode %in% c("precomputation", "experiment")){
+if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
   cat(sprintf("Reading in GO data...\n"))
   # reduced_graph_50_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)
@@ -70,7 +70,7 @@ if(mode %in% c("precomputation", "experiment")){
   G$Pa = parents_indexed
   G$C = children_indexed
   
-  if("Structured_Holm" %in% methods & mode == "experiment"){
+  if("Structured_Holm" %in% methods & input_mode == "experiment"){
     cat(sprintf("Creating DAG for Structured Holm...\n"))
     G_SH = new("DAGstructure", parents = parents_indexed, 
                children = children_indexed, sets = sets, twoway = FALSE)
