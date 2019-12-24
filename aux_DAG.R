@@ -235,3 +235,28 @@ get_depths = function(Pa){
   }
   return(depths)  
 }
+
+get_heights = function(C){
+  m = length(C)
+  heights = numeric(m)
+  while(TRUE){
+    done = TRUE
+    for(j in 1:m){
+      if(heights[j] == 0){
+        done = FALSE
+        if(length(C[[j]]) == 0){
+          heights[j] = 1
+        } 
+        else{
+          if(all(heights[C[[j]]] > 0)){
+            heights[j] = 1 + max(heights[C[[j]]])
+          }
+        }
+      }
+    }
+    if(done){
+      break
+    }
+  }
+  return(heights)  
+}

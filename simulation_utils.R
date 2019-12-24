@@ -1,7 +1,9 @@
 run_one_experiment = function(experiment_name, experiment_index, base_dir){
-  # set up all the simulation parameters
+  set.seed(1234) # for reproducibility
   
+  # set up all the simulation parameters
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
+  mode = "experiment"
   source(input_filename, local = TRUE)
   
   cat(sprintf("Starting simulation with signal strength = %0.1f...\n", signal_strength))
@@ -18,73 +20,100 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   delta = 0
   beta = numeric(num_genes)
   beta[nonnull_genes] = signal_strength
-  # logit_probabilities = base_log_odds + beta
-  # gene_probabilities = plogis(logit_probabilities)
-  
-  # deduce non-null GO terms
-  # genes_per_term = as.numeric(matrix(gene_probabilities,1,num_genes) %*% adj_matrix)
-  # genes_per_term_null = mean(gene_probabilities)*colSums(adj_matrix)
-  # nonnull_terms = genes_per_term > genes_per_term_null
-  # means_per_term = as.numeric(matrix(beta,1,num_genes) %*% adj_matrix)/colSums(adj_matrix)
-  # nonnull_terms = means_per_term > delta
-  # mean(nonnull_terms)
-  
 
-  # mean(nonnull_terms)
-  
   num_annotations = sapply(sets, length)
   
   # for permutation method
-  gamma = function(t)(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
-  gamma_oracle = function(t)(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
+  if("Focused_BH_permutation" %in% methods){
+    # load precomputation results
+    precomp_dir = sprintf("%s/precomp/%s", base_dir, experiment_name)
+    stopifnot(dir.exists(precomp_dir))
+    precomp_files = list.files(precomp_dir)
+    B = length(precomp_files)
+    stopifnot(B > 0)
+    null_V_hats = vector("list", length())
+    for(b in 1:B){
+        V_hat = read_tsv(precomp_files[b], col_types = "dii")
+        V_hat$b = b
+        null_V_hats[[b]] = V_hat
+    }
+    null_V_hats = do.call("rbind", null_V_hats)
+    # compute V_hat_permutation
+    V_hat_permutation = function(t){
+      if(t <= t_max){
+        return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
+      } else{
+        return(m*t)
+      }
+    }
+    # compute V_hat_oracle
+    V_hat_oracle = function(t){
+      if(t <= t_max){
+        return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
+      } else{
+        return(m*t)
+      }
+    }
+  }
   
   for(rep in 1:reps){
     cat(sprintf("Working on repetition %d out of %d...\n", rep, reps))
-    # problem setup
-
+    
+    ### Problem setup ###
+    # compute gene-level p-values
     DE_stats = beta + rnorm(num_genes)
     P_gene = pnorm(DE_stats, lower.tail = FALSE)
-    P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
-                                        df = 2*num_annotations[id], 
-                                        lower.tail = FALSE)))
-    # P = numeric(m)
-    # names(P) = ids
-    # for(id in ids){
-      # P[id] = fisher.test(DE_genes, adj_matrix[,id], alternative = "greater")$p.value
-      # P[id] = t.test(DE_stats[adj_matrix[,id]], DE_stats[!adj_matrix[,id]], alternative = "greater")$p.value
-    # }
+    # compute group-level p-values
+    if(global_test == "Fisher"){
+      P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
+                                          df = 2*num_annotations[id], 
+                                          lower.tail = FALSE)))
+    }
+    if(global_test == "Simes"){
+      P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations/(1:num_annotations))))
+    }
     
-    selected = matrix(FALSE, num_methods, m, dimnames = list(methods, ids))
+    ### Run all methods ###
+    
+    # to store rejections
+    rejections = matrix(FALSE, num_methods, m, dimnames = list(methods, ids))
     
     # BH
-    selected["BH",] = p.adjust(P, "fdr") <= q/mean(!nonnull_terms)
+    if("BH" %in% methods){
+      rejections["BH",] = p.adjust(P, "fdr") <= q/mean(!nonnull_terms)
+    }
 
     # Structured Holm
-    if(min(P) >= q/m){
-      selected["Structured_Holm",] = rep(FALSE, m)
-    } else{
-      selected["Structured_Holm",] = structuredHolm(G_SH, alpha_max = q, pvalues=P)@rejected
+    if("Structured_Holm" %in% methods){
+      if(min(P) >= q/m){
+        rejections["Structured_Holm",] = rep(FALSE, m)
+      } else{
+        rejections["Structured_Holm",] = structuredHolm(G_SH, alpha_max = q, pvalues=P)@rejected
+      }
     }
         
     # Focused BH (original)
-    selected["Focused_BH_original",] = FocusedBH(filter_name, P, G, q)
+    if("Focused_BH_original" %in% methods){
+      rejections["Focused_BH_original",] = FocusedBH(filter_name, P, G, q)
+    }
     
     # Focused BH (permutation)
-    selected["Focused_BH_permutation",] = FocusedBH(filter_name, P, G, q, gamma)
+    if("Focused_BH_permutation" %in% methods){
+      rejections["Focused_BH_permutation",] = FocusedBH(filter_name, P, G, q, V_hat_permutation)      
+    }
+    
+    # Focused BH (oracle)
+    if("Focused_BH_oracle" %in% methods){
+      rejections["Focused_BH_oracle",] = FocusedBH(filter_name, P, G, q, V_hat_oracle)      
+    }
     
     # Filter the results
     for(method in methods){
-      R = selected[method,]
+      R = rejections[method,]
       R_F = run_filter(P, R, G, filter_name)
-      # metrics["knockoffs", "power", rep] = sum(selected[nonnull_terms])/length(nonnull_terms)
+      # metrics["knockoffs", "power", rep] = sum(rejections[nonnull_terms])/length(nonnull_terms)
       metrics[method, "power", rep] = sum(R_F[nonnull_terms])
       metrics[method, "fdp", rep] = sum(R_F[!nonnull_terms])/max(1,sum(R_F))
-      cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",rep]))
-      cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",rep]))
-    }
-    
-    # verbose option useful for interactive runs
-    for(method in methods){
       cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",rep]))
       cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",rep]))
     }
@@ -97,8 +126,9 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
 }
 
 run_one_precomputation = function(experiment_name, b, base_dir){
-  set.seed(1234+b) # for reproducibility
+  set.seed(1234+b) # for reproducibility; should be different for different b
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
+  mode = "precomputation"
   source(input_filename, local = TRUE)
   
   num_annotations = sapply(sets, length)
@@ -106,14 +136,18 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   cat(sprintf("Generating null p-values...\n"))
   DE_stats = rnorm(num_genes)
   P_gene = pnorm(DE_stats, lower.tail = FALSE)
-  P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
-                                      df = 2*num_annotations[id], 
-                                      lower.tail = FALSE)))
+  if(global_test == "Fisher"){
+    P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
+                                        df = 2*num_annotations[id], 
+                                        lower.tail = FALSE)))
+  }
+  if(global_test == "Simes"){
+    P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations/(1:num_annotations))))
+  }
   ord = order(P)
   
   k_max = sum(P <= t_max)
   V_hat = matrix(0, k_max, 3, dimnames = list(NULL, c("pvalue", "V_oracle", "V_permutation")))
-  
   
   for(k in k_max:1){
     cat(sprintf("Considering rejection set of size %d...\n", k))

@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="12_19_19"    # will define input file
+experiment_name="GO"    # will define input file
 mode="interactive"            # interactive or batch
 
 # set base directory depending on machine
@@ -34,7 +34,7 @@ then
   mkdir $results_dir
 fi
 
-num_experiments=$(Rscript $input_filename)
+num_experiments=$(Rscript $input_filename num_experiments)
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
   echo "Submitting job for experiment number "$experiment_index

@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="12_19_19"    # will define input file
+experiment_name="GO"    # will define input file
 mode="batch"            # interactive or batch
 
 # set base directory depending on machine
@@ -34,7 +34,7 @@ then
 mkdir $precomp_dir
 fi
 
-num_experiments=100
+num_experiments=$(Rscript $input_filename num_precomputations)
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
   do
 echo "Submitting job for precomputation number "$experiment_index
@@ -49,7 +49,7 @@ if [ $machine == "PSC" ]
 then
 if [ $mode == "batch" ] 
 then
-sbatch --time=01:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+sbatch --time=02:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
 fi
 if [ $mode == "interactive" ] 
 then
