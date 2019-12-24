@@ -21,7 +21,7 @@ num_args = length(args)
 stopifnot(num_args <= 1)
 if(num_args == 0){
   stopifnot(exists("mode"))
-  stopifnot("mode" %in% c("experiment", "precomputation"))
+  stopifnot(mode %in% c("experiment", "precomputation"))
   if(mode == "experiment"){
     stopifnot(exists("experiment_index"))
   }
@@ -31,9 +31,7 @@ if(num_args == 0){
 }
 if(num_args == 1){
   mode = args[1]
-  print(mode)
-  print(mode == "num_precomputations")
-  stopifnot("mode" %in% c("num_experiments", "num_precomputations"))
+  stopifnot(mode %in% c("num_experiments", "num_precomputations"))
   if(mode == "num_experiments"){
     cat(nrow(parameters))
   }
