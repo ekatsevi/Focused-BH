@@ -27,6 +27,7 @@ if(exists("mode")){
     stopifnot(exists("b"))
   }
 } else{
+  print("In num mode")
   args = commandArgs(trailingOnly = TRUE)
   print(args)
   num_args = length(args)
