@@ -7,12 +7,12 @@ annotations_zipped_file=$data_dir"/goa_human.gaf.gz"
 annotations_file=$data_dir"/goa_human.gaf"
 gene_list_file=$data_dir"/gene_list.txt"
 
-if ! test -f $ontology_file; then
+if test ! -f $ontology_file; then
     echo "Downloading ontology file..."
     wget http://current.geneontology.org/ontology/go-basic.obo -P $data_dir    
 fi
 
-if ! -f $annotations_file; then
+if test ! -f $annotations_file; then
     if test -f $annotations_zipped_file; then
       gunzip $annotations_zipped_file
     else
@@ -23,7 +23,7 @@ if ! -f $annotations_file; then
     fi
 fi
 
-if ! test -f $gene_list_file; then
+if test ! -f $gene_list_file; then
     echo "Downloading Van't'veer gene list..."
     wget http://cbl-gorilla.cs.technion.ac.il/VantVeerMoreLess5.txt -P $data_dir -O gene_list.txt
 fi
