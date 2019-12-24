@@ -1,4 +1,4 @@
-source("setup.R")
+library(tidyverse)
 
 ### set top-level parameters
 reps = 10                         # Number of outer-loop repetitions
