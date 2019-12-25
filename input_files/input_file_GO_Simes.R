@@ -1,16 +1,16 @@
 suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
-reps = 2                         # Number of outer-loop repetitions
+reps = 1                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
             "Focused_BH_oracle",
             "Structured_Holm")
 q = 0.1                           # FDR control level
-signal_strength_vals = c(1,2,3,4,5)
+signal_strength_vals = seq(1,6,by=0.5)
 global_test = "Simes"
-k_max = 350  # maximum p-value threshold considered by permutation approach
+k_max = 350   # maximum p-value threshold considered by permutation approach
 B = 100       # number of repetitions
 filter_name = "REVIGO"
 parameters = tibble(signal_strength_vals)
@@ -92,8 +92,8 @@ if(input_mode %in% c("precomputation", "experiment")){
   # sum(nonnull_terms)
   # mean(nonnull_terms)
   # P = numeric(m)
-  # P[!nonnull_terms | num_annotations > 100] = 1
-  # R_F = run_filter(P, nonnull_terms & num_annotations <= 100, G, "REVIGO")
+  # P[!nonnull_terms] = 1
+  # R_F = run_filter(P, nonnull_terms, G, "REVIGO")
   # hist(colSums(adj_matrix[nonnull_genes,nonnull_terms]), breaks = 10)
   # hist(colSums(adj_matrix[nonnull_genes,nonnull_terms])/colSums(adj_matrix[,nonnull_terms]), breaks = 20)
 }

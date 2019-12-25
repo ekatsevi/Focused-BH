@@ -5,7 +5,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
   input_mode = "experiment"
   source(input_filename, local = TRUE)
-  
+
   cat(sprintf("Starting simulation with signal strength = %0.1f...\n", signal_strength))
   
   # set up arrays to hold results
@@ -38,19 +38,11 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     null_V_hats = do.call("rbind", null_V_hats)
     # compute V_hat_permutation
     V_hat_permutation = function(t){
-      if(t <= t_max){
-        return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
-      } else{
-        return(m*t)
-      }
+      return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
     }
     # compute V_hat_oracle
     V_hat_oracle = function(t){
-      if(t <= t_max){
-        return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
-      } else{
-        return(m*t)
-      }
+      return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
     }
   }
   
@@ -90,27 +82,34 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       }
     }
         
+    fbh_methods = intersect(methods, c("Focused_BH_original", "Focused_BH_permutation", "Focused_BH_oracle"))
+    
+    V_hats = vector("list", length(fbh_methods))
+    names(V_hats) = fbh_methods
     # Focused BH (original)
     if("Focused_BH_original" %in% methods){
-      rejections["Focused_BH_original",] = FocusedBH(filter_name, P, G, q)
+      V_hats[["Focused_BH_original"]] = function(t)(m*t)
     }
-    
+
     # Focused BH (permutation)
     if("Focused_BH_permutation" %in% methods){
-      rejections["Focused_BH_permutation",] = FocusedBH(
-        filter_name, P, G, q, V_hat_permutation)
+      V_hats[["Focused_BH_permutation"]] = V_hat_permutation
     }
     
     # Focused BH (oracle)
     if("Focused_BH_oracle" %in% methods){
-      rejections["Focused_BH_oracle",] = FocusedBH(filter_name, P, G, q, V_hat_oracle)      
+      V_hats[["Focused_BH_oracle"]] = V_hat_oracle
     }
+    
+    rejections[fbh_methods,] = FocusedBH(filter_name, P, G, q, V_hats)
     
     # Filter the results
     for(method in methods){
       R = rejections[method,]
+      if(sum(R) > k_max){
+        R[which(R)[order(P[R])[(k_max+1):sum(R)]]] = FALSE
+      }
       R_F = run_filter(P, R, G, filter_name)
-      # metrics["knockoffs", "power", rep] = sum(rejections[nonnull_terms])/length(nonnull_terms)
       metrics[method, "power", rep] = sum(R_F[nonnull_terms])
       metrics[method, "fdp", rep] = sum(R_F[!nonnull_terms])/max(1,sum(R_F))
       cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",rep]))

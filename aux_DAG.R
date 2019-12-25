@@ -1,4 +1,5 @@
 FocusedBH_outer_nodes = function(P, G, q, gamma = NULL){
+  ### TBD: add multi-FDP-hat functionality like for FocusedBH function
   m = G$m
   if(is.null(gamma)){
     gamma = function(p)(m*p)
@@ -13,34 +14,52 @@ FocusedBH_outer_nodes = function(P, G, q, gamma = NULL){
   return(R)
 }
 
-FocusedBH = function(filter_name, P, G, q, gamma = NULL){
+FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
   cat(sprintf("Running Focused BH...\n"))
   if(filter_name == "outer_nodes"){
-    return(FocusedBH_outer_nodes(P, G, q, gamma))
+    return(FocusedBH_outer_nodes(P, G, q, V_hats))
   }
   m = G$m
-  if(is.null(gamma)){
-    gamma = function(p)(m*p)
+  V_hats_input = V_hats
+  if(is.null(V_hats_input)){
+    V_hats = list(function(t)(m*t))
+    names(V_hats) = "Focused BH original"
+  } else if(!is.list(V_hats_input)){
+    V_hats = list()
+    V_hats[[1]] = V_hats_input
+    names(V_hats) = "Focused BH"
+  } else{
+    V_hats = V_hats_input
   }
+  
+  num_V_hats = length(V_hats)
+  
   ord = order(P)
   fdr_thresh = max(P[p.adjust(P, "fdr") <= q])
   k_start = sum(P <= fdr_thresh)
   
-  if(k_start == 0){
-    return(logical(m))
-  } else{
+  rejections = matrix(FALSE, num_V_hats, m)
+  complete = logical(num_V_hats)
+  if(k_start > 0){
     for(k in k_start:1){
       cat(sprintf("Considering rejection set of size %d...\n", k))
       R = logical(m)
       R[ord[1:k]] = TRUE
       R_F = run_filter(P, R, G, filter_name)
-      FDP_hat = gamma(P[ord[k]])/sum(R_F)
-      if(FDP_hat <= q){
-        return(R)
+      for(index in which(!complete)){
+        FDP_hat = V_hats[[index]](P[ord[k]])/sum(R_F)
+        if(FDP_hat <= q){
+          rejections[index,] = R
+          cat(sprintf("Found threshold for %s!\n", names(V_hats)[index]))
+          complete[index] = TRUE
+          if(all(complete)){
+            return(rejections)
+          }
+        }
       }
     }
-    return(logical(m))
   }
+  return(rejections)
 }
 
 run_filter = function(P, R, G, filter_name){

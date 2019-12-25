@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="GO"    # will define input file
+experiment_name="GO_Simes"    # will define input file
 mode="interactive"            # interactive or batch
 
 # set base directory depending on machine
@@ -49,7 +49,7 @@ do
   then
     if [ $mode == "batch" ] 
     then
-      sbatch --time=06:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
     then
