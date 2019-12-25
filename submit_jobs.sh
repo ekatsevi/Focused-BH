@@ -38,7 +38,7 @@ num_experiments=$(Rscript $input_filename num_experiments)
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
   echo "Submitting job for experiment number "$experiment_index
-  command="./run_one_precomputation.sh $experiment_name $experiment_index $base_dir $machine"
+  command="./run_one_experiment.sh $experiment_name $experiment_index $base_dir $machine"
   logs_filename=$logs_dir"/"$experiment_name"_"$experiment_index".Rout"
   # construct final call based on machine
   if [ $machine == "local" ] 
