@@ -46,7 +46,7 @@ if(exists("input_mode")){
 if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
   cat(sprintf("Reading in GO data...\n"))
-  reduced_graph_100_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)
+  reduced_graph_100_file = sprintf("%s/data/processed/reduced_graph_100.Rda", base_dir)
   load(reduced_graph_100_file)
   # reduced_graph_file = sprintf("%s/data/processed/reduced_graph.Rda", base_dir)
   # load(reduced_graph_file)
