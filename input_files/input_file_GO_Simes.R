@@ -46,17 +46,14 @@ if(exists("input_mode")){
 if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
   cat(sprintf("Reading in GO data...\n"))
-  # reduced_graph_50_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)
-  # load(reduced_graph_50_file)
-  reduced_graph_file = sprintf("%s/data/processed/reduced_graph.Rda", base_dir)
-  load(reduced_graph_file)
+  reduced_graph_100_file = sprintf("%s/data/processed/reduced_graph_50.Rda", base_dir)
+  load(reduced_graph_100_file)
+  # reduced_graph_file = sprintf("%s/data/processed/reduced_graph.Rda", base_dir)
+  # load(reduced_graph_file)
   
   gene_sets = G$gene_sets
-  to_remove = names(which(sapply(G$gene_sets, length) > 100))
-  G = subset_graph(to_remove, G)
   ids = names(G$C)
-  m = length(ids)
-  gene_sets = gene_sets[ids]
+  m = G$m
   num_annotations = sapply(gene_sets, length)
   
   index = c()

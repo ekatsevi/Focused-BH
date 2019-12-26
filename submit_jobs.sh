@@ -49,7 +49,7 @@ do
   then
     if [ $mode == "batch" ] 
     then
-      sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=05:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
     then
