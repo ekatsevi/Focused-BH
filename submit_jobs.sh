@@ -35,7 +35,6 @@ then
 fi
 
 num_experiments=$(Rscript $input_filename num_experiments)
-echo $num_experiments
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
   echo "Submitting job for experiment number "$experiment_index
@@ -50,7 +49,6 @@ do
   then
     if [ $mode == "batch" ] 
     then
-      echo $command
       sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
