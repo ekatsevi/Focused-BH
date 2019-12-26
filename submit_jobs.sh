@@ -51,7 +51,7 @@ do
     if [ $mode == "batch" ] 
     then
       echo $command
-#      sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
     then

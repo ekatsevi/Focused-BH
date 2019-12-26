@@ -5,8 +5,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   input_mode = "experiment"
   source(input_filename, local = TRUE)
 
-  cat(sprintf("Starting simulation with signal strength = %0.1f...\n", signal_strength))
-  
   # set up arrays to hold results
   num_methods = length(methods)
   num_parameters = nrow(parameters)
