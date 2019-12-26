@@ -38,7 +38,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     null_V_hats = do.call("rbind", null_V_hats)
     null_V_hats = rbind(null_V_hats, tibble(pvalue = rep(0,B), V_oracle = rep(0,B), 
                                                V_permutation = rep(0, B), b = 1:B))
-    add_row(pvalue = 0, V_oracle = 0, V_permutation = 0, b = 0)
     # compute V_hat_permutation
     V_hat_permutation = function(t){
       return(null_V_hats %>% filter(pvalue <= t) %>% group_by(b) %>% 
