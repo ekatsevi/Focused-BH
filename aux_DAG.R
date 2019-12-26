@@ -38,6 +38,10 @@ FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
   fdr_thresh = max(P[p.adjust(P, "fdr") <= q])
   k_start = sum(P <= fdr_thresh)
   
+  if(filter_name == "REVIGO"){
+    k_start = min(k_start, 350)
+  }
+  
   rejections = matrix(FALSE, num_V_hats, m)
   complete = logical(num_V_hats)
   if(k_start > 0){
@@ -67,20 +71,76 @@ run_filter = function(P, R, G, filter_name){
     return(get_outer_nodes(R, G))
   }
   
-  if(filter_name == "REVIGO"){
+  if(filter_name %in% c("REVIGO", "REVIGO2")){
     R = R & P < 0.5
-    goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)
-    command = sprintf("echo \"%s\" | java -jar REVIGO/RevigoStandalone.jar /dev/stdin --stdout --cutoff=0.5", goterms)
-    output = system(command, intern = TRUE)
-    matrix_output = do.call("rbind", lapply(output[3:length(output)], function(str)(unname(strsplit(str, split = "\t"))[[1]])))
-    df_output = as.data.frame(matrix_output[2:nrow(matrix_output),,drop=F])
-    names(df_output) = matrix_output[1,]
-    R_F = R
-    R_F[which(R_F)] = df_output$eliminated == 0
-    
+    if(sum(R) == 0){
+      R_F = R
+    } else{
+      if(filter_name == "REVIGO"){
+        goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)        
+      }
+      if(filter_name == "REVIGO2"){
+        goterms = tibble(names(which(R))) %>% format_tsv(col_names = FALSE)        
+      }
+      command = sprintf("echo \"%s\" | java -jar REVIGO/RevigoStandalone.jar /dev/stdin --stdout --cutoff=0.5", goterms)
+      output = system(command, intern = TRUE)
+      matrix_output = do.call("rbind", lapply(output[3:length(output)], function(str)(unname(strsplit(str, split = "\t"))[[1]])))
+      df_output = as.data.frame(matrix_output[2:nrow(matrix_output),,drop=F])
+      names(df_output) = matrix_output[1,]
+      df_output = df_output %>% as_tibble() %>% mutate(term_ID = as.character(term_ID), 
+                                                       eliminated = as.numeric(as.character(eliminated)))
+      # df_output$frequency = sapply(as.character(df_output$frequency), function(freq)(strsplit(freq, split = "%")[[1]]))
+      # df_output = df_output %>% as_tibble() %>%
+      #   dplyr::select(term_ID, frequency, `log10_p-value`, 
+      #          uniqueness, dispensability, representative, eliminated) %>%
+      #   mutate_all(as.character) %>% 
+      #   mutate_at(c(frequency, `log10_p-value`, uniqueness, 
+      #               dispensability, eliminated),
+      #             as.numeric)
+      filtered_rejections = df_output %>% filter(eliminated == 0) %>% pull(term_ID)
+      R_F = logical(length(R))
+      names(R_F) = names(R)
+      R_F[filtered_rejections] = TRUE
+    }
     return(R_F)
   }
 }
+
+# # temporary
+# REVIGO = function(P, R){
+#   if(filter_name == "REVIGO"){
+#     R = R & P < 0.5
+#     if(sum(R) == 0){
+#       return(NULL)
+#     } else{
+#       # goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)
+#       goterms = tibble(names(which(R))) %>% format_tsv(col_names = FALSE)
+#       command = sprintf("echo \"%s\" | java -jar REVIGO/RevigoStandalone.jar /dev/stdin --stdout --cutoff=0.5", goterms)
+#       output = system(command, intern = TRUE)
+#       matrix_output = do.call("rbind", 
+#                               lapply(output[3:length(output)], 
+#                                      function(str)(unname(strsplit(str, split = "\t"))[[1]])))
+#       df_output = as.data.frame(matrix_output[2:nrow(matrix_output),,drop=F])
+#       names(df_output) = matrix_output[1,]
+#       df_output$frequency = sapply(as.character(df_output$frequency), function(freq)(strsplit(freq, split = "%")[[1]]))
+#       return(df_output %>% as_tibble() %>%
+#                select("term_ID", "frequency", "log10_p-value", 
+#                       "uniqueness", "dispensability", "representative", "eliminated") %>%
+#                mutate_all(as.character) %>% 
+#                mutate_at(c("frequency", "log10_p-value", "uniqueness", 
+#                            "dispensability", "eliminated"),
+#                          as.numeric))
+#       df_output = df_output %>% as_tibble() %>%
+#         dplyr::select("term_ID", "frequency", 
+#                       "uniqueness", "dispensability", "representative", "eliminated") %>%
+#         mutate_all(as.character) %>% 
+#         mutate_at(c("frequency", "uniqueness", 
+#                     "dispensability", "eliminated"),
+#                   as.numeric)
+#     }
+#   }
+# }
+
 
 # Compute outer nodes for a set of nodes in a graph
 # S: logical inclusion vector for set of nodes

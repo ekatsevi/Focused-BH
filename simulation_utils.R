@@ -36,6 +36,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
         null_V_hats[[b]] = V_hat
     }
     null_V_hats = do.call("rbind", null_V_hats)
+    null_V_hats = null_V_hats %>% add_row(pvalue = 0, V_oracle = 0, V_permutation = 0, b = 0)
     # compute V_hat_permutation
     V_hat_permutation = function(t){
       return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_permutation)) %>% pull())
@@ -44,6 +45,9 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     V_hat_oracle = function(t){
       return(null_V_hats %>% filter(pvalue <= t) %>% summarise(mean(V_oracle)) %>% pull())
     }
+    # t = seq(0, 0.02, length.out = 1000)
+    # df = tibble(t, V_hat_perm = sapply(t, V_hat_permutation), V_hat_original = m*t)
+    
   }
   
   for(rep in 1:reps){
