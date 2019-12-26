@@ -1,5 +1,4 @@
 run_one_experiment = function(experiment_name, experiment_index, base_dir){
-  set.seed(1234) # for reproducibility
   
   # set up all the simulation parameters
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
@@ -10,16 +9,11 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   
   # set up arrays to hold results
   num_methods = length(methods)
-  
+  num_parameters = nrow(parameters)
   # FDR and power
   metrics = array(0, 
-                  dim = c(num_methods, 2, reps), 
+                  dim = c(num_methods, 2, num_parameters), 
                   dimnames = list(methods, c("power", "fdp"), NULL))
-
-  # create set of non-nulls genes
-  beta = numeric(num_genes)
-  names(beta) = genes
-  beta[nonnull_genes] = signal_strength
 
   # for permutation method
   if("Focused_BH_permutation" %in% methods){
@@ -55,8 +49,20 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     #   geom_line() + theme_bw()
   }
   
-  for(rep in 1:reps){
-    cat(sprintf("Working on repetition %d out of %d...\n", rep, reps))
+  for(index in 1:num_parameters){
+    rep = parameters$rep[index]
+    signal_strength = parameters$signal_strength[index]
+
+    set.seed(1234+rep) # for reproducibility; should vary by rep
+    
+    # create set of non-nulls genes
+    beta = numeric(num_genes)
+    names(beta) = genes
+    beta[nonnull_genes] = signal_strength
+    
+    
+    cat(sprintf("Working on parameter index %d out of %d, corresponding to rep %d for signal strength %0.1f...\n", 
+                index, num_parameters, rep, signal_strength))
     
     ### Problem setup ###
     # compute gene-level p-values
@@ -119,16 +125,17 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
         R[which(R)[order(P[R])[(k_max+1):sum(R)]]] = FALSE
       }
       R_F = run_filter(P, R, G, filter_name)
-      metrics[method, "power", rep] = sum(R_F[nonnull_terms])
-      metrics[method, "fdp", rep] = sum(R_F[!nonnull_terms])/max(1,sum(R_F))
-      cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",rep]))
-      cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",rep]))
+      metrics[method, "power", index] = sum(R_F[nonnull_terms])
+      metrics[method, "fdp", index] = sum(R_F[!nonnull_terms])/max(1,sum(R_F))
+      cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",index]))
+      cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",index]))
     }
   }
   df = melt(metrics)
-  names(df) = c("method", "metric", "rep", "value")
-  df$signal_strength = signal_strength
+  names(df) = c("method", "metric", "index", "value")
   df = as_tibble(df)
+  df = df %>% mutate(signal_strength = parameters$signal_strength[index], rep = parameters$rep[index]) %>%
+    dplyr::select(-index)
   write_tsv(df, path = sprintf("%s/results/%s/metrics_%s_%d.tsv", base_dir, experiment_name, experiment_name, experiment_index))
 }
 

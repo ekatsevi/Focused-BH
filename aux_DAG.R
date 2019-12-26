@@ -72,11 +72,11 @@ run_filter = function(P, R, G, filter_name){
   }
   
   if(filter_name %in% c("REVIGO", "REVIGO2")){
-    R = R & P < 0.5
     if(sum(R) == 0){
       R_F = R
     } else{
       if(filter_name == "REVIGO"){
+        R = R & P < 0.5
         goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)        
       }
       if(filter_name == "REVIGO2"){
