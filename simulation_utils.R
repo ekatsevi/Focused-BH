@@ -40,11 +40,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       return(null_V_hats %>% filter(pvalue <= t) %>% group_by(b) %>% 
                summarise(V = max(V_oracle)) %>% summarise(mean(V)) %>% pull())
     }
-    # t = seq(0, 0.02, length.out = 1000)
-    # df = tibble(t, V_hat_perm = sapply(t, V_hat_permutation), V_hat_original = m*t)
-    # df %>% gather(estimate, V_hat, -t) %>%
-    #   ggplot(aes(x = t, y = V_hat, group = estimate, colour = estimate)) + 
-    #   geom_line() + theme_bw()
   }
   
   for(index in 1:num_parameters){
@@ -54,9 +49,8 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     set.seed(1234+rep) # for reproducibility; should vary by rep
     
     # create set of non-nulls genes
-    beta = numeric(num_genes)
-    names(beta) = genes
-    beta[nonnull_genes] = signal_strength
+    beta = numeric(num_items)
+    beta[nonnull_items] = signal_strength
     
     
     cat(sprintf("Working on parameter index %d out of %d, corresponding to rep %d for signal strength %0.1f...\n", 
@@ -64,26 +58,31 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     
     ### Problem setup ###
     # compute gene-level p-values
-    DE_stats = beta + rnorm(num_genes)
-    P_gene = pnorm(DE_stats, lower.tail = FALSE)
+    item_stats = beta + rnorm(num_items)
+    P_item = pnorm(item_stats, lower.tail = FALSE)
     # compute group-level p-values
     if(global_test == "Fisher"){
-      P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
-                                          df = 2*num_annotations[id], 
+      P = sapply(1:m, function(node)(pchisq(q = -2*sum(log(P_item[adj_matrix[,node]])), 
+                                          df = 2*items_per_node[node], 
                                           lower.tail = FALSE)))
     }
     if(global_test == "Simes"){
-      P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations[id]/(1:num_annotations[id]))))
+      P = sapply(1:m, function(node)(min(sort(P_item[adj_matrix[,node]])*items_per_node[node]/(1:items_per_node[node]))))
     }
     
     ### Run all methods ###
     
     # to store rejections
-    rejections = matrix(FALSE, num_methods, m, dimnames = list(methods, ids))
-    
+    rejections = matrix(FALSE, num_methods, m, dimnames = list(methods, 1:m))
+
     # BH
     if("BH" %in% methods){
-      rejections["BH",] = p.adjust(P, "fdr") <= q/mean(!nonnull_terms)
+      rejections["BH",] = p.adjust(P, "fdr") <= q
+    }
+        
+    # Storey-BH
+    if("Storey_BH" %in% methods){
+      rejections["Storey_BH",] = p.adjust(P, "fdr") <= q/mean(!nonnull_terms)
     }
 
     # Structured Holm
@@ -95,10 +94,13 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       }
     }
         
-    fbh_methods = intersect(methods, c("Focused_BH_original", "Focused_BH_permutation", "Focused_BH_oracle"))
+    fbh_methods = intersect(methods, c("Focused_BH_original", 
+                                       "Focused_BH_permutation", 
+                                       "Focused_BH_oracle"))
     
     V_hats = vector("list", length(fbh_methods))
     names(V_hats) = fbh_methods
+    
     # Focused BH (original)
     if("Focused_BH_original" %in% methods){
       V_hats[["Focused_BH_original"]] = function(t)(m*t)
@@ -123,8 +125,8 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
         R[which(R)[order(P[R])[(k_max+1):sum(R)]]] = FALSE
       }
       R_F = run_filter(P, R, G, filter_name)
-      metrics[method, "power", index] = sum(R_F[nonnull_terms])
-      metrics[method, "fdp", index] = sum(R_F[!nonnull_terms])/max(1,sum(R_F))
+      metrics[method, "power", index] = sum(R_F[nonnull_nodes])
+      metrics[method, "fdp", index] = sum(R_F[!nonnull_nodes])/max(1,sum(R_F))
       cat(sprintf("Power of %s is %0.2f.\n", method, metrics[method,"power",index]))
       cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",index]))
     }
@@ -134,7 +136,14 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   df = as_tibble(df)
   df = df %>% mutate(signal_strength = parameters$signal_strength[index], rep = parameters$rep[index]) %>%
     dplyr::select(-index)
-  write_tsv(df, path = sprintf("%s/results/%s/metrics_%s_%d.tsv", base_dir, experiment_name, experiment_name, experiment_index))
+  output_filename = sprintf("%s/results/%s/metrics_%s_%d.tsv", 
+                            base_dir, experiment_name, experiment_name, experiment_index)
+  output_filename = "~/Desktop/test.tsv"
+  write_tsv(df, path = output_filename)
+  
+  # add provenance information to output file
+  add_git_info(output_filename)
+  add_R_session_info(output_filename)
 }
 
 run_one_precomputation = function(experiment_name, b, base_dir){
@@ -144,15 +153,15 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   source(input_filename, local = TRUE)
   
   cat(sprintf("Generating null p-values...\n"))
-  DE_stats = rnorm(num_genes)
-  P_gene = pnorm(DE_stats, lower.tail = FALSE)
+  item_stats = rnorm(num_items)
+  P_item = pnorm(item_stats, lower.tail = FALSE)
   if(global_test == "Fisher"){
-    P = sapply(ids, function(id)(pchisq(q = -2*sum(log(P_gene[adj_matrix[,id]])), 
-                                        df = 2*num_annotations[id], 
+    P = sapply(1:m, function(node)(pchisq(q = -2*sum(log(P_item[adj_matrix[,node]])), 
+                                        df = 2*items_per_node[node], 
                                         lower.tail = FALSE)))
   }
   if(global_test == "Simes"){
-    P = sapply(ids, function(id)(min(sort(P_gene[adj_matrix[,id]])*num_annotations[id]/(1:num_annotations[id]))))
+    P = sapply(1:m, function(node)(min(sort(P_item[adj_matrix[,node]])*items_per_node[node]/(1:items_per_node[node]))))
   }
   ord = order(P)
   
@@ -162,7 +171,6 @@ run_one_precomputation = function(experiment_name, b, base_dir){
     cat(sprintf("Considering rejection set of size %d...\n", k))
     R = logical(m)
     R[ord[1:k]] = TRUE
-    names(R) = ids
     R_F = run_filter(P, R, G, filter_name)
     V_hat[k, "pvalue"] = P[ord[k]]
     V_hat[k, "V_oracle"] = sum(R_F & !nonnull_terms)

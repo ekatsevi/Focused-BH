@@ -7,21 +7,21 @@ reps = 100                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
+            "Yekutieli",
+            # "Focused_BH_oracle",
             "Structured_Holm")
 q = 0.1                           # FDR control level
 signal_strength_vals = seq(1,7,by=0.5)
 # signal_strength_vals = 6
-global_test = "Simes"
-k_max = 350   # maximum p-value threshold considered by permutation approach
+global_test = "Fisher"
 B = 100       # number of repetitions
-filter_name = "REVIGO"
+filter_name = "outer_nodes"
 parameters = as_tibble(merge(1:reps, signal_strength_vals))
 names(parameters) = c("rep", "signal_strength")
 num_experiments = ceiling(reps*length(signal_strength_vals)/reps_per_experiment)
 parameters$experiment = 1:num_experiments
 
 ### set input_mode (experiment, precomputation, num_experiments, num_precomputations)
-# TBD: write a function that does the following
 if(exists("input_mode")){
   stopifnot(input_mode %in% c("experiment", "precomputation"))
   if(input_mode == "experiment"){
@@ -48,25 +48,44 @@ if(exists("input_mode")){
 ### define the graph
 if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
-  GO_reduced_graph_100_file = sprintf("%s/data/processed/GO_reduced_graph_100.Rda", base_dir)
-  load(GO_reduced_graph_100_file)
-
-  num_items = G$num_items
+  cat(sprintf("Reading in ICD graph...\n"))
+  graph_file = sprintf("%s/data/processed/ICD_graph.Rda", base_dir)
+  load(graph_file)
+  
+  gene_sets = G$gene_sets
+  ids = names(G$C)
   m = G$m
-  # create adjacency matrix between genes and GO terms
-  adj_matrix = matrix(FALSE, num_items, m)
-  for(node in 1:m){
-    genes_in_node = G$sets[[node]]
-    adj_matrix[genes_in_node, node] = TRUE
+  num_annotations = sapply(gene_sets, length)
+  
+  index = c()
+  for(i in 1:m){
+    index[[ids[i]]] = i
   }
-  items_per_node = sapply(G$sets, length)
   
-  # sample 2 "anchor GO terms" with 5 annotations each
-  anchor_terms = withSeed(sample(which(items_per_node == 5), 2), 1)
+  parents_indexed = sapply(G$Pa, function(parents_list)(unname(index[parents_list])))
+  children_indexed = sapply(G$C, function(children_list)(unname(index[children_list])))
   
-  # define the genes belonging to the anchor terms non-null
-  nonnull_items = unique(unlist(G$sets[anchor_terms]))
+  G = c()
+  G$m = m
+  G$Pa = parents_indexed
+  G$C = children_indexed
   
-  # deduce which other GO terms are non-null
-  nonnull_nodes = colSums(adj_matrix[nonnull_items,]) > 0
+  if("Structured_Holm" %in% methods & input_mode == "experiment"){
+    cat(sprintf("Creating DAG for Structured Holm...\n"))
+    G_SH = new("DAGstructure", parents = parents_indexed, 
+               children = children_indexed, sets = gene_sets, twoway = FALSE)
+  }
+  
+  genes = unique(unlist(gene_sets))
+  num_genes = length(genes)
+  adj_matrix = matrix(FALSE, num_genes, m)
+  rownames(adj_matrix) = genes
+  colnames(adj_matrix) = ids
+  for(id in ids){
+    adj_matrix[gene_sets[[id]],id] = TRUE
+  }
+  
+  anchor_terms = withSeed(sample(which(num_annotations == 5), 2), 1)
+  nonnull_genes = unique(unlist(lapply(gene_sets[anchor_terms], function(set)(set))))
+  nonnull_terms = colSums(adj_matrix[nonnull_genes,]) > 0
 }

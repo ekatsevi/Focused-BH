@@ -9,19 +9,21 @@ if(machine == "PSC"){
 # download data and run preprocessing
 system(sprintf("./download_GO_data.sh %s", base_dir))
 source("parse_GO_files.R")
+# source("parse_ICD_files.R")
 
-# libraries
-suppressPackageStartupMessages(library(readxl))
-suppressPackageStartupMessages(library(ontologyIndex))
-suppressPackageStartupMessages(library(qvalue))
-suppressPackageStartupMessages(library(cherry))      # to run the Structured Holm procedure (Meijer and Goeman, 2015b)
-suppressPackageStartupMessages(library(structSSI))   # to perform Yekutieli test
-suppressPackageStartupMessages(library(igraph))      # to perform Yekutieli test
-suppressPackageStartupMessages(library(ape))         # to perform Yekutieli test
-suppressPackageStartupMessages(library(R.utils))
-suppressPackageStartupMessages(library(reshape2))
-suppressPackageStartupMessages(library(tidyverse))
+load_silently = function(packages){
+  for(package in packages){
+    suppressPackageStartupMessages(library(package, character.only = TRUE))    
+  }
+  invisible()
+}
+
+# load libraries
+load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry", 
+                "structSSI", "igraph", "ape", "R.utils", "reshape2", 
+                "tidyverse"))
 
 # auxiliary functions
 source("aux_DAG.R")
 source("simulation_utils.R")
+source("utils_provenance.R")

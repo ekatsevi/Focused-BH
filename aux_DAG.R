@@ -57,11 +57,17 @@ FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
           cat(sprintf("Found threshold for %s!\n", names(V_hats)[index]))
           complete[index] = TRUE
           if(all(complete)){
+            if(num_V_hats == 1){
+              rejections = as.numeric(rejections)
+            }
             return(rejections)
           }
         }
       }
     }
+  }
+  if(num_V_hats == 1){
+    rejections = as.numeric(rejections)
   }
   return(rejections)
 }
@@ -77,70 +83,29 @@ run_filter = function(P, R, G, filter_name){
     } else{
       if(filter_name == "REVIGO"){
         R = R & P < 0.5
-        goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)        
+        goterms = tibble(G$node_names[R], P[R]) %>% format_tsv(col_names = FALSE)        
       }
       if(filter_name == "REVIGO2"){
-        goterms = tibble(names(which(R))) %>% format_tsv(col_names = FALSE)        
+        goterms = tibble(G$node_names[R]) %>% format_tsv(col_names = FALSE)        
       }
       command = sprintf("echo \"%s\" | java -jar REVIGO/RevigoStandalone.jar /dev/stdin --stdout --cutoff=0.5", goterms)
       output = system(command, intern = TRUE)
-      matrix_output = do.call("rbind", lapply(output[3:length(output)], function(str)(unname(strsplit(str, split = "\t"))[[1]])))
+      matrix_output = do.call("rbind", 
+                              lapply(output[3:length(output)], 
+                                     function(str)(unname(strsplit(str, split = "\t"))[[1]])))
       df_output = as.data.frame(matrix_output[2:nrow(matrix_output),,drop=F])
       names(df_output) = matrix_output[1,]
-      df_output = df_output %>% as_tibble() %>% mutate(term_ID = as.character(term_ID), 
-                                                       eliminated = as.numeric(as.character(eliminated)))
-      # df_output$frequency = sapply(as.character(df_output$frequency), function(freq)(strsplit(freq, split = "%")[[1]]))
-      # df_output = df_output %>% as_tibble() %>%
-      #   dplyr::select(term_ID, frequency, `log10_p-value`, 
-      #          uniqueness, dispensability, representative, eliminated) %>%
-      #   mutate_all(as.character) %>% 
-      #   mutate_at(c(frequency, `log10_p-value`, uniqueness, 
-      #               dispensability, eliminated),
-      #             as.numeric)
+      df_output = df_output %>% 
+        as_tibble() %>% 
+        mutate(term_ID = as.character(term_ID), 
+               eliminated = as.numeric(as.character(eliminated)))
       filtered_rejections = df_output %>% filter(eliminated == 0) %>% pull(term_ID)
       R_F = logical(length(R))
-      names(R_F) = names(R)
-      R_F[filtered_rejections] = TRUE
+      R_F[G$node_names %in% filtered_rejections] = TRUE
     }
     return(R_F)
   }
 }
-
-# # temporary
-# REVIGO = function(P, R){
-#   if(filter_name == "REVIGO"){
-#     R = R & P < 0.5
-#     if(sum(R) == 0){
-#       return(NULL)
-#     } else{
-#       # goterms = tibble(names(which(R)), P[R]) %>% format_tsv(col_names = FALSE)
-#       goterms = tibble(names(which(R))) %>% format_tsv(col_names = FALSE)
-#       command = sprintf("echo \"%s\" | java -jar REVIGO/RevigoStandalone.jar /dev/stdin --stdout --cutoff=0.5", goterms)
-#       output = system(command, intern = TRUE)
-#       matrix_output = do.call("rbind", 
-#                               lapply(output[3:length(output)], 
-#                                      function(str)(unname(strsplit(str, split = "\t"))[[1]])))
-#       df_output = as.data.frame(matrix_output[2:nrow(matrix_output),,drop=F])
-#       names(df_output) = matrix_output[1,]
-#       df_output$frequency = sapply(as.character(df_output$frequency), function(freq)(strsplit(freq, split = "%")[[1]]))
-#       return(df_output %>% as_tibble() %>%
-#                select("term_ID", "frequency", "log10_p-value", 
-#                       "uniqueness", "dispensability", "representative", "eliminated") %>%
-#                mutate_all(as.character) %>% 
-#                mutate_at(c("frequency", "log10_p-value", "uniqueness", 
-#                            "dispensability", "eliminated"),
-#                          as.numeric))
-#       df_output = df_output %>% as_tibble() %>%
-#         dplyr::select("term_ID", "frequency", 
-#                       "uniqueness", "dispensability", "representative", "eliminated") %>%
-#         mutate_all(as.character) %>% 
-#         mutate_at(c("frequency", "uniqueness", 
-#                     "dispensability", "eliminated"),
-#                   as.numeric)
-#     }
-#   }
-# }
-
 
 # Compute outer nodes for a set of nodes in a graph
 # S: logical inclusion vector for set of nodes
@@ -257,7 +222,7 @@ get_ancestors = function(R, G){
 }
 
 get_descendants = function(R, G){
-  n = G$n
+  m = G$m
   C = G$C
   traverse = function(node, descendant){
     if(!descendant[node]){
@@ -268,7 +233,7 @@ get_descendants = function(R, G){
     }
     return(descendant)
   }
-  descendant = logical(n)
+  descendant = logical(m)
   for(node in which(R)){
     descendant = traverse(node, descendant)
   }
@@ -278,20 +243,49 @@ get_descendants = function(R, G){
 subset_graph = function(to_remove, G){
   C = G$C
   Pa = G$Pa
-  for(i in to_remove){
-    # print(i)
+  
+  # remove nodes one at a time, rewiring the graph 
+  # to preserve DAG relationships 
+  for(i in which(to_remove)){
     for(j in C[[i]]){
       Pa[[j]] = union(setdiff(Pa[[j]], i), Pa[[i]]) # remove i, add i's parents
     }
     for(j in Pa[[i]]){
       C[[j]] = union(setdiff(C[[j]], i), C[[i]]) # remove i, add i's children
     }
-    C[[i]] = NULL
-    Pa[[i]] = NULL
   }
+  
+  # remove nodes and re-index the graph
+  m_new = sum(!to_remove) # number of remaining nodes
+  index = integer(G$m)
+  index[which(!to_remove)] = 1:m_new
+  Pa_new = sapply(Pa[!to_remove], function(parents_list)(index[parents_list]))
+  C_new = sapply(C[!to_remove], function(children_list)(index[children_list]))
+
+  # extract subsets of node names and sets
+  node_names_new = G$node_names[!to_remove]
+  sets_new = G$sets[!to_remove]
+  item_names_new = G$item_names
+  
+  # if necessary, re-index the item names
+  num_items_new = length(unique(unlist(sets_new)))
+  if(num_items_new < G$num_items){
+    remaining_items = unique(unlist(sets_new))
+    item_names_new = G$item_names[remaining_items]
+    item_index = integer(G$num_items)
+    item_index[remaining_items] = 1:num_items_new
+    sets_new = sapply(1:m_new, function(node)(item_index[sets_new[[node]]]))
+  }
+    
+  # package into new graph object and return
   G_new = c()
-  G_new$C = C
-  G_new$Pa = Pa
+  G_new$m = m_new
+  G_new$num_items = num_items_new
+  G_new$C = C_new
+  G_new$Pa = Pa_new
+  G_new$sets = sets_new
+  G_new$node_names = node_names_new
+  G_new$item_names = item_names_new
   return(G_new)
 }
 
