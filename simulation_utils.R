@@ -138,7 +138,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     dplyr::select(-index)
   output_filename = sprintf("%s/results/%s/metrics_%s_%d.tsv", 
                             base_dir, experiment_name, experiment_name, experiment_index)
-  output_filename = "~/Desktop/test.tsv"
   write_tsv(df, path = output_filename)
   
   # add provenance information to output file

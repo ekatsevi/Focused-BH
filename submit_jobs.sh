@@ -29,7 +29,7 @@ if [ ! -d "$logs_dir" ]
 then
   mkdir $logs_dir
 fi
-if [ ! -d "$results_dir" ] 
+if [ ! -d "$results_dir" ]
 then
   mkdir $results_dir
 fi
@@ -49,7 +49,7 @@ do
   then
     if [ $mode == "batch" ] 
     then
-      sbatch --time=04:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=02:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
     then
