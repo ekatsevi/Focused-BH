@@ -34,8 +34,7 @@ then
   mkdir $results_dir
 fi
 
-# num_experiments=$(Rscript $input_filename num_experiments)
-num_experiments=1
+num_experiments=$(Rscript $input_filename num_experiments)
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
   echo "Submitting job for experiment number "$experiment_index

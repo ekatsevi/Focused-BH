@@ -1,7 +1,7 @@
 suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
-reps_per_experiment = 5 # CHANGE BACK!
+reps_per_experiment = 100 
 reps = 100                         # Number of outer-loop repetitions
 # reps = 1
 methods = c("BH",                 # methods
