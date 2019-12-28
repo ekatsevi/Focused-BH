@@ -3,7 +3,7 @@ Yekutieli = function(P, G_Yekutieli, q){
   m = length(P)
   names(unadj.p.values) = sapply(1:(m+1), as.character)
   hyp.tree = my.hFDR.adjust(unadj.p.values, G_Yekutieli, q)
-  R = hyp.tree@p.vals[[2]] <= q_Yekutieli
+  R = hyp.tree@p.vals[[2]] <= q
   R[is.na(R)] = FALSE
   rejections["Yekutieli",] = R[1:m]
 }
