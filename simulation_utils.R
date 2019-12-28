@@ -1,19 +1,17 @@
 run_one_experiment = function(experiment_name, experiment_index, base_dir){
-  
   # set up all the simulation parameters
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
   input_mode = "experiment"
   source(input_filename, local = TRUE)
 
-  # set up arrays to hold results
+  # set up arrays to hold results (FDP and power)
   num_methods = length(methods)
   num_parameters = nrow(parameters)
-  # FDR and power
   metrics = array(0, 
                   dim = c(num_methods, 2, num_parameters), 
                   dimnames = list(methods, c("power", "fdp"), NULL))
 
-  # precomputation for Focused BH (permutation)
+  # define V_hat for Focused BH (permutation) based on precomputed null values
   if("Focused_BH_permutation" %in% methods){
     # load precomputation results
     precomp_dir = sprintf("%s/precomp/%s", base_dir, experiment_name)
@@ -24,50 +22,45 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     null_V_hats = vector("list", B)
     for(b in 1:B){
         precomp_filename = sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b])
-        V_hat = read_tsv(precomp_filename, col_types = "dii")
+        V_hat = read_tsv(precomp_filename, col_types = "di", comment = "#")
         V_hat$b = b
-        null_V_hats[[b]] = V_hat
+        null_V_hats[[b]] = V_hat %>% filter(pvalue <= q)
     }
     null_V_hats = do.call("rbind", null_V_hats)
-    null_V_hats = rbind(null_V_hats, tibble(pvalue = rep(0,B), V_oracle = rep(0,B), 
-                                               V_permutation = rep(0, B), b = 1:B))
+
     # compute V_hat_permutation
     V_hat_permutation = function(t){
       return(null_V_hats %>% filter(pvalue <= t) %>% group_by(b) %>% 
                summarise(V = max(V_permutation)) %>% summarise(mean(V)) %>% pull())
-    }
-    # compute V_hat_oracle
-    V_hat_oracle = function(t){
-      return(null_V_hats %>% filter(pvalue <= t) %>% group_by(b) %>% 
-               summarise(V = max(V_oracle)) %>% summarise(mean(V)) %>% pull())
     }
   }
   
   # precomputation for Yekutieli
   if("Yekutieli" %in% methods){
     depths = get_depths(G$Pa)
-    q_Yekutieli = q/(2*max(depths))
+    q_Yekutieli = q/(2*max(depths)) # corrected FDR target level 
   }
   
+  # run all methods for each setting of parameters 
   for(index in 1:num_parameters){
-    rep = parameters$rep[index]
+    rep = parameters$rep[index] 
     signal_strength = parameters$signal_strength[index]
 
     set.seed(1234+rep) # for reproducibility; should vary by rep
     
-    # create set of non-nulls genes
+    # create effect sizes based on signal strength and non-null items
     beta = numeric(num_items)
     beta[nonnull_items] = signal_strength
-    
     
     cat(sprintf("Working on parameter index %d out of %d, corresponding to rep %d for signal strength %0.1f...\n", 
                 index, num_parameters, rep, signal_strength))
     
     ### Problem setup ###
-    # compute gene-level p-values
+    # compute item-level p-values
     item_stats = beta + rnorm(num_items)
     P_item = pnorm(item_stats, lower.tail = FALSE)
-    # compute group-level p-values
+    
+    # compute node-level p-values
     if(global_test == "Fisher"){
       P = sapply(1:m, function(node)(pchisq(q = -2*sum(log(P_item[adj_matrix[,node]])), 
                                           df = 2*items_per_node[node], 
@@ -127,11 +120,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       V_hats[["Focused_BH_permutation"]] = V_hat_permutation
     }
     
-    # Focused BH (oracle)
-    if("Focused_BH_oracle" %in% methods){
-      V_hats[["Focused_BH_oracle"]] = V_hat_oracle
-    }
-    
     rejections[fbh_methods,] = FocusedBH(filter_name, P, G, q, V_hats)
     
     # Filter the results
@@ -147,10 +135,13 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       cat(sprintf("FDP of %s is %0.2f.\n", method, metrics[method,"fdp",index]))
     }
   }
+  
+  # massage results into data frame and write to file
   df = melt(metrics)
   names(df) = c("method", "metric", "index", "value")
   df = as_tibble(df)
-  df = df %>% mutate(signal_strength = parameters$signal_strength[index], rep = parameters$rep[index]) %>%
+  df = df %>% mutate(signal_strength = parameters$signal_strength[index], 
+                     rep = parameters$rep[index]) %>%
     dplyr::select(-index)
   output_filename = sprintf("%s/results/%s/metrics_%s_%d.tsv", 
                             base_dir, experiment_name, experiment_name, experiment_index)
@@ -166,11 +157,13 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
 
 run_one_precomputation = function(experiment_name, b, base_dir){
   set.seed(1234+b) # for reproducibility; should be different for different b
+  
+  # set up all the simulation parameters
   input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
   input_mode = "precomputation"
   source(input_filename, local = TRUE)
   
-  cat(sprintf("Generating null p-values...\n"))
+  # generate the null p-values
   item_stats = rnorm(num_items)
   P_item = pnorm(item_stats, lower.tail = FALSE)
   if(global_test == "Fisher"){
@@ -183,9 +176,11 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   }
   ord = order(P)
   
+  # matrix to store V_hat 
   V_hat = matrix(0, k_max+1, 2, dimnames = list(NULL, c("pvalue", "V_permutation")))
   
-  if(filter == "outer_nodes"){
+  # treat outer nodes filter separately because a faster algorithm is available
+  if(filter_name == "outer_nodes"){
     V_hat[,"pvalue"] = c(0,sort(P))
     V_hat[,"V_permutation"] = rev(get_num_outer_nodes(P, G))
   } else{
@@ -194,19 +189,22 @@ run_one_precomputation = function(experiment_name, b, base_dir){
       R = logical(m)
       R[ord[1:k]] = TRUE
       R_F = run_filter(P, R, G, filter_name)
-      V_hat[k+1, "pvalue"] = P[ord[k]]
-      # V_hat[k, "V_oracle"] = sum(R_F & !nonnull_terms)
+      V_hat[k+1, "pvalue"] = P[ord[k]]      
       V_hat[k+1, "V_permutation"] = sum(R_F)
     }
     V_hat[1, "pvalue"] = 0
     V_hat[1, "V_permutation"] = 0
   }
+  
+  # write to file
   output_filename = sprintf("%s/precomp/%s/precomp_%s_%d.tsv", 
                            base_dir, experiment_name, experiment_name, b) 
   write_tsv(as_tibble(V_hat), path = output_filename)
+  
+  # add provenance information to output file
   call_info = sprintf("#\n#\n### FUNCTION CALL: ###\n# run_one_precomputation(experiment_name = \"%s\", b = %d, base_dir = \"%s\")", 
                       experiment_name, b, base_dir)
-  write(call_info, filename, append = TRUE)
+  write(call_info, output_filename, append = TRUE)
   add_git_info(output_filename)
   add_R_session_info(output_filename)
 }

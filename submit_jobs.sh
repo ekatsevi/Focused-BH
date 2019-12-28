@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="GO_Simes"    # will define input file
+experiment_name="PheWAS_Fisher"    # will define input file
 mode="batch"            # interactive or batch
 
 # set base directory depending on machine
@@ -34,7 +34,8 @@ then
   mkdir $results_dir
 fi
 
-num_experiments=$(Rscript $input_filename num_experiments)
+# num_experiments=$(Rscript $input_filename num_experiments)
+num_experiments=1
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
   echo "Submitting job for experiment number "$experiment_index
@@ -43,13 +44,20 @@ do
   # construct final call based on machine
   if [ $machine == "local" ] 
   then
+    if [ $mode == "batch" ] 
+    then
     $command > $logs_filename 2> $logs_filename &
+    fi
+    if [ $mode == "interactive" ] 
+    then
+    $command
+    fi
   fi
   if [ $machine == "PSC" ]
   then
     if [ $mode == "batch" ] 
     then
-      sbatch --time=02:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=00:30:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ] 
     then

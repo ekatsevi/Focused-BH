@@ -1,7 +1,7 @@
 suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
-reps_per_experiment = 25
+reps_per_experiment = 10 # CHANGE BACK!
 reps = 100                         # Number of outer-loop repetitions
 # reps = 1
 methods = c("BH",                 # methods
@@ -47,33 +47,46 @@ if(exists("input_mode")){
 ### define the graph
 if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
-  cat(sprintf("Reading in ICD graph...\n"))
   graph_file = sprintf("%s/data/processed/ICD_graph.Rda", base_dir)
   load(graph_file)
   
   num_items = G$num_items
   m = G$m
   k_max = m
+  
   # create adjacency matrix between genes and GO terms
-  adj_matrix = matrix(FALSE, num_items, m)
-  for(node in 1:m){
-    genes_in_node = G$sets[[node]]
-    adj_matrix[genes_in_node, node] = TRUE
-  }
+  
   items_per_node = sapply(G$sets, length)
+  i = integer(sum(items_per_node))
+  j = integer(sum(items_per_node))
+  index = 1
+  for(node in 1:m){
+    items_in_node = G$sets[[node]]
+    i[index:(index+items_per_node[node]-1)] = items_in_node
+    j[index:(index+items_per_node[node]-1)] = node
+    index = index + items_per_node[node]
+  }
+  adj_matrix = sparseMatrix(i, j, dims = c(num_items, m))
+  
+  # Non-sparse equivalent code
+  # adj_matrix = matrix(FALSE, num_items, m)
+  # for(node in 1:m){
+  #   items_in_node = G$sets[[node]]
+  #   adj_matrix[items_in_node, node] = TRUE
+  # }
+  
   
   node_depths = get_depths(G$Pa)
-  leaves = sapply(C, length) == 0
+  leaves = sapply(G$C, length) == 0
+  num_deep_leaves = get_num_marked_descendants(G$C,  leaves & node_depths == 5)
   
-  # num_deep_leaves = sapply(1:m, function(node)(sum(get_descendants(1:m == node, G$C) & 
-  #                                                    leaves & node_depths == 5)))
-  
-  # sample 5 "anchor nodes" (ICD codes) with 10 
+  # sample 5 "anchor nodes" (ICD codes) with 10
   anchor_nodes = withSeed(sample(which(10 <= num_deep_leaves &
                                          num_deep_leaves <= 20 & node_depths == 3), 10), 1)
 
   # define the genes belonging to the anchor terms non-null
-  nonnull_items = unique(unlist(sapply(G$sets[anchor_nodes], function(set)(withSeed(sample(set, 5),1)))))
+  nonnull_items = unique(unlist(lapply(G$sets[anchor_nodes], 
+                                       function(set)(withSeed(sample(set, 5),1)))))
   
   # deduce which other GO terms are non-null
   nonnull_nodes = colSums(adj_matrix[nonnull_items,]) > 0

@@ -16,7 +16,7 @@ load_silently = function(packages){
 
 load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry", 
                 "structSSI", "igraph", "ape", "R.utils", "reshape2", 
-                "tidyverse"))
+                "tidyverse", "Matrix"))
 
 
 # download data and run preprocessing

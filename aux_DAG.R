@@ -1,24 +1,48 @@
-FocusedBH_outer_nodes = function(P, G, q, gamma = NULL){
-  ### TBD: add multi-FDP-hat functionality like for FocusedBH function
+FocusedBH_outer_nodes = function(P, G, q, V_hats = NULL){
   m = G$m
-  if(is.null(gamma)){
-    gamma = function(p)(m*p)
+  V_hats_input = V_hats
+  if(is.null(V_hats_input)){
+    V_hats = list(function(t)(m*t))
+    names(V_hats) = "Focused BH original"
+  } else if(!is.list(V_hats_input)){
+    V_hats = list()
+    V_hats[[1]] = V_hats_input
+    names(V_hats) = "Focused BH"
+  } else{
+    V_hats = V_hats_input
   }
+  num_V_hats = length(V_hats)
+
+  rejections = matrix(FALSE, num_V_hats, m)
+  
+  BH_rejections = p.adjust(P, "fdr") <= q
+  if(sum(BH_rejections) == 0){
+    return(rejections)
+  }
+  
+  BH_thresh = max(P[BH_rejections])
+  
   num_rejections = get_num_outer_nodes(P, G)
-  P_aug = sort(c(0,P), decreasing = TRUE)
-  FDP_hat = gamma(P_aug)/num_rejections
-  FDP_hat[is.na(FDP_hat)] = 0
-  FDP_hat[G$m+1] = 0
-  idx = min(which(FDP_hat <= q))
-  R = P <= P_aug[idx]
-  return(R)
+  P_aug = sort(c(0, P[P <= BH_thresh]), decreasing = TRUE)
+  
+  for(index in 1:num_V_hats){
+    V_hat = sapply(P_aug, V_hats[[index]])    
+    FDP_hat = V_hat/num_rejections[(1 + (m+1) - length(P_aug)):(m+1)]
+    FDP_hat[is.na(FDP_hat)] = 0
+    idx = min(which(FDP_hat <= q))
+    rejections[index,] = P <= P_aug[idx]
+  }
+  if(num_V_hats == 1){
+    rejections = as.numeric(rejections)
+  }
+  return(rejections)
 }
 
 FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
-  cat(sprintf("Running Focused BH...\n"))
   if(filter_name == "outer_nodes"){
     return(FocusedBH_outer_nodes(P, G, q, V_hats))
   }
+  cat(sprintf("Running Focused BH...\n"))
   m = G$m
   V_hats_input = V_hats
   if(is.null(V_hats_input)){
@@ -33,35 +57,39 @@ FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
   }
   
   num_V_hats = length(V_hats)
+  rejections = matrix(FALSE, num_V_hats, m)
+  
+  BH_rejections = p.adjust(P, "fdr") <= q
+  if(sum(BH_rejections) == 0){
+    return(rejections)
+  }
+  
+  BH_thresh = max(P[BH_rejections])
   
   ord = order(P)
-  fdr_thresh = max(P[p.adjust(P, "fdr") <= q])
-  k_start = sum(P <= fdr_thresh)
+  k_start = sum(P <= BH_thresh)
   
   if(filter_name == "REVIGO"){
     k_start = min(k_start, 350)
   }
   
-  rejections = matrix(FALSE, num_V_hats, m)
   complete = logical(num_V_hats)
-  if(k_start > 0){
-    for(k in k_start:1){
-      cat(sprintf("Considering rejection set of size %d...\n", k))
-      R = logical(m)
-      R[ord[1:k]] = TRUE
-      R_F = run_filter(P, R, G, filter_name)
-      for(index in which(!complete)){
-        FDP_hat = V_hats[[index]](P[ord[k]])/sum(R_F)
-        if(FDP_hat <= q){
-          rejections[index,] = R
-          cat(sprintf("Found threshold for %s!\n", names(V_hats)[index]))
-          complete[index] = TRUE
-          if(all(complete)){
-            if(num_V_hats == 1){
-              rejections = as.numeric(rejections)
-            }
-            return(rejections)
+  for(k in k_start:1){
+    cat(sprintf("Considering rejection set of size %d...\n", k))
+    R = logical(m)
+    R[ord[1:k]] = TRUE
+    R_F = run_filter(P, R, G, filter_name)
+    for(index in which(!complete)){
+      FDP_hat = V_hats[[index]](P[ord[k]])/sum(R_F)
+      if(FDP_hat <= q){
+        rejections[index,] = R
+        cat(sprintf("Found threshold for %s!\n", names(V_hats)[index]))
+        complete[index] = TRUE
+        if(all(complete)){
+          if(num_V_hats == 1){
+            rejections = as.numeric(rejections)
           }
+          return(rejections)
         }
       }
     }
@@ -336,4 +364,31 @@ get_heights = function(C){
     }
   }
   return(heights)  
+}
+
+# get the number of descendants of each node that are
+# among a list of marked nodes (only works for trees)
+get_num_marked_descendants = function(C, marked){
+  m = length(C)
+  num_marked_descendants = rep(-1,m)
+  while(TRUE){
+    done = TRUE
+    for(j in 1:m){
+      if(num_marked_descendants[j] == -1){
+        done = FALSE
+        if(length(C[[j]]) == 0){
+          num_marked_descendants[j] = as.numeric(marked[j])
+        } 
+        else{
+          if(all(num_marked_descendants[C[[j]]] > -1)){
+            num_marked_descendants[j] = as.numeric(marked[j]) + sum(num_marked_descendants[C[[j]]])
+          }
+        }
+      }
+    }
+    if(done){
+      break
+    }
+  }
+  return(num_marked_descendants)  
 }
