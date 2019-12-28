@@ -5,7 +5,7 @@ Yekutieli = function(P, G_Yekutieli, q){
   hyp.tree = my.hFDR.adjust(unadj.p.values, G_Yekutieli, q)
   R = hyp.tree@p.vals[[2]] <= q
   R[is.na(R)] = FALSE
-  rejections["Yekutieli",] = R[1:m]
+  return(R[1:m])
 }
 
 my.hFDR.adjust = function(unadjp, tree.el, alpha = 0.05) 
