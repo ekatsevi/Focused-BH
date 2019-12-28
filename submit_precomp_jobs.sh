@@ -5,9 +5,9 @@
 # Submit jobs for Focused BH
 
 # simulation parameters
-machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="GO_Simes"    # will define input file
-mode="batch"            # interactive or batch
+machine="local"                 # which machine it's running on (local, ubergenno, PSC)
+experiment_name="PheWAS_Fisher"    # will define input file
+mode="interactive"            # interactive or batch
 
 # set base directory depending on machine
 if [ $machine == "local" ]
@@ -43,8 +43,15 @@ logs_filename=$logs_dir"/"$experiment_name"_"$experiment_index".Rout"
 # construct final call based on machine
 if [ $machine == "local" ] 
 then
+if [ $mode == "batch" ] 
+then
 $command > $logs_filename 2> $logs_filename &
-  fi
+fi
+if [ $mode == "interactive" ] 
+then
+$command
+fi
+fi
 if [ $machine == "PSC" ]
 then
 if [ $mode == "batch" ] 

@@ -221,9 +221,8 @@ get_ancestors = function(R, G){
   return(ancestor)
 }
 
-get_descendants = function(R, G){
-  m = G$m
-  C = G$C
+get_descendants = function(R, C){
+  m = length(C)
   traverse = function(node, descendant){
     if(!descendant[node]){
       descendant[node] = TRUE

@@ -61,11 +61,11 @@ if(input_mode %in% c("precomputation", "experiment")){
   }
   items_per_node = sapply(G$sets, length)
   
-  # sample 2 "anchor GO terms" with 5 annotations each
-  anchor_terms = withSeed(sample(which(items_per_node == 5), 2), 1)
+  # sample 2 "anchor nodes" (GO terms) with 5 annotations each
+  anchor_nodes = withSeed(sample(which(items_per_node == 5), 2), 1)
   
   # define the genes belonging to the anchor terms non-null
-  nonnull_items = unique(unlist(G$sets[anchor_terms]))
+  nonnull_items = unique(unlist(G$sets[anchor_nodes]))
   
   # deduce which other GO terms are non-null
   nonnull_nodes = colSums(adj_matrix[nonnull_items,]) > 0

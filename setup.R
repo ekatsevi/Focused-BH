@@ -22,7 +22,7 @@ load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry",
 # download data and run preprocessing
 system(sprintf("./download_GO_data.sh %s", base_dir))
 source("parse_GO_files.R")
-# source("parse_ICD_files.R")
+source("parse_ICD_files.R") # TBD: make a download script for this and integrate it into the file itself
 
 # auxiliary functions
 source("aux_DAG.R")

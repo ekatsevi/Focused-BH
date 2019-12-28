@@ -8,7 +8,6 @@ methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
             "Yekutieli",
-            # "Focused_BH_oracle",
             "Structured_Holm")
 q = 0.1                           # FDR control level
 signal_strength_vals = seq(1,7,by=0.5)
@@ -52,40 +51,30 @@ if(input_mode %in% c("precomputation", "experiment")){
   graph_file = sprintf("%s/data/processed/ICD_graph.Rda", base_dir)
   load(graph_file)
   
-  gene_sets = G$gene_sets
-  ids = names(G$C)
+  num_items = G$num_items
   m = G$m
-  num_annotations = sapply(gene_sets, length)
-  
-  index = c()
-  for(i in 1:m){
-    index[[ids[i]]] = i
+  k_max = m
+  # create adjacency matrix between genes and GO terms
+  adj_matrix = matrix(FALSE, num_items, m)
+  for(node in 1:m){
+    genes_in_node = G$sets[[node]]
+    adj_matrix[genes_in_node, node] = TRUE
   }
+  items_per_node = sapply(G$sets, length)
   
-  parents_indexed = sapply(G$Pa, function(parents_list)(unname(index[parents_list])))
-  children_indexed = sapply(G$C, function(children_list)(unname(index[children_list])))
+  node_depths = get_depths(G$Pa)
+  leaves = sapply(C, length) == 0
   
-  G = c()
-  G$m = m
-  G$Pa = parents_indexed
-  G$C = children_indexed
+  # num_deep_leaves = sapply(1:m, function(node)(sum(get_descendants(1:m == node, G$C) & 
+  #                                                    leaves & node_depths == 5)))
   
-  if("Structured_Holm" %in% methods & input_mode == "experiment"){
-    cat(sprintf("Creating DAG for Structured Holm...\n"))
-    G_SH = new("DAGstructure", parents = parents_indexed, 
-               children = children_indexed, sets = gene_sets, twoway = FALSE)
-  }
+  # sample 5 "anchor nodes" (ICD codes) with 10 
+  anchor_nodes = withSeed(sample(which(10 <= num_deep_leaves &
+                                         num_deep_leaves <= 20 & node_depths == 3), 10), 1)
+
+  # define the genes belonging to the anchor terms non-null
+  nonnull_items = unique(unlist(sapply(G$sets[anchor_nodes], function(set)(withSeed(sample(set, 5),1)))))
   
-  genes = unique(unlist(gene_sets))
-  num_genes = length(genes)
-  adj_matrix = matrix(FALSE, num_genes, m)
-  rownames(adj_matrix) = genes
-  colnames(adj_matrix) = ids
-  for(id in ids){
-    adj_matrix[gene_sets[[id]],id] = TRUE
-  }
-  
-  anchor_terms = withSeed(sample(which(num_annotations == 5), 2), 1)
-  nonnull_genes = unique(unlist(lapply(gene_sets[anchor_terms], function(set)(set))))
-  nonnull_terms = colSums(adj_matrix[nonnull_genes,]) > 0
+  # deduce which other GO terms are non-null
+  nonnull_nodes = colSums(adj_matrix[nonnull_items,]) > 0
 }

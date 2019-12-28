@@ -1,3 +1,8 @@
+add_call_info = function(filename, experiment_name, experiment_index, base_dir){
+  call_info = sprintf("#\n#\n### FUNCTION CALL: ###\n# run_one_experiment(experiment_name = \"%s\", experiment_index = %d, base_dir = \"%s\")", experiment_name, experiment_index, base_dir)
+  write(call_info, filename, append = TRUE)
+}
+
 add_git_info = function(filename){
   # TBD: make this function portable to operating systems other than Linux
   if(file.exists(".git")){

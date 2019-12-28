@@ -13,7 +13,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
                   dim = c(num_methods, 2, num_parameters), 
                   dimnames = list(methods, c("power", "fdp"), NULL))
 
-  # for permutation method
+  # precomputation for Focused BH (permutation)
   if("Focused_BH_permutation" %in% methods){
     # load precomputation results
     precomp_dir = sprintf("%s/precomp/%s", base_dir, experiment_name)
@@ -23,7 +23,8 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     stopifnot(B > 0)
     null_V_hats = vector("list", B)
     for(b in 1:B){
-        V_hat = read_tsv(sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b]), col_types = "dii")
+        precomp_filename = sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b])
+        V_hat = read_tsv(precomp_filename, col_types = "dii")
         V_hat$b = b
         null_V_hats[[b]] = V_hat
     }
@@ -40,6 +41,12 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       return(null_V_hats %>% filter(pvalue <= t) %>% group_by(b) %>% 
                summarise(V = max(V_oracle)) %>% summarise(mean(V)) %>% pull())
     }
+  }
+  
+  # precomputation for Yekutieli
+  if("Yekutieli" %in% methods){
+    depths = get_depths(G$Pa)
+    q_Yekutieli = q/(2*max(depths))
   }
   
   for(index in 1:num_parameters){
@@ -93,6 +100,15 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
         rejections["Structured_Holm",] = structuredHolm(G_SH, alpha_max = q, pvalues=P)@rejected
       }
     }
+    
+    if("Yekutieli" %in% methods){
+      unadj.p.values = c(P, 0)
+      names(unadj.p.values) = sapply(1:(m+1), as.character)
+      hyp.tree = hFDR.adjust(unadj.p.values, G_Yekutieli, q_Yekutieli)
+      R = hyp.tree@p.vals[[2]] <= q_Yekutieli
+      R[is.na(R)] = FALSE
+      rejections["Yekutieli",] = R[1:m]
+    }
         
     fbh_methods = intersect(methods, c("Focused_BH_original", 
                                        "Focused_BH_permutation", 
@@ -141,6 +157,9 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   write_tsv(df, path = output_filename)
   
   # add provenance information to output file
+  call_info = sprintf("#\n#\n### FUNCTION CALL: ###\n# run_one_experiment(experiment_name = \"%s\", experiment_index = %d, base_dir = \"%s\")", 
+                      experiment_name, experiment_index, base_dir)
+  write(call_info, filename, append = TRUE)
   add_git_info(output_filename)
   add_R_session_info(output_filename)
 }
@@ -164,18 +183,30 @@ run_one_precomputation = function(experiment_name, b, base_dir){
   }
   ord = order(P)
   
-  V_hat = matrix(0, k_max, 3, dimnames = list(NULL, c("pvalue", "V_oracle", "V_permutation")))
+  V_hat = matrix(0, k_max+1, 2, dimnames = list(NULL, c("pvalue", "V_permutation")))
   
-  for(k in k_max:1){
-    cat(sprintf("Considering rejection set of size %d...\n", k))
-    R = logical(m)
-    R[ord[1:k]] = TRUE
-    R_F = run_filter(P, R, G, filter_name)
-    V_hat[k, "pvalue"] = P[ord[k]]
-    V_hat[k, "V_oracle"] = sum(R_F & !nonnull_terms)
-    V_hat[k, "V_permutation"] = sum(R_F)
+  if(filter == "outer_nodes"){
+    V_hat[,"pvalue"] = c(0,sort(P))
+    V_hat[,"V_permutation"] = rev(get_num_outer_nodes(P, G))
+  } else{
+    for(k in k_max:1){
+      cat(sprintf("Considering rejection set of size %d...\n", k))
+      R = logical(m)
+      R[ord[1:k]] = TRUE
+      R_F = run_filter(P, R, G, filter_name)
+      V_hat[k+1, "pvalue"] = P[ord[k]]
+      # V_hat[k, "V_oracle"] = sum(R_F & !nonnull_terms)
+      V_hat[k+1, "V_permutation"] = sum(R_F)
+    }
+    V_hat[1, "pvalue"] = 0
+    V_hat[1, "V_permutation"] = 0
   }
-  write_tsv(as_tibble(V_hat), 
-            path = sprintf("%s/precomp/%s/precomp_%s_%d.tsv", 
-                           base_dir, experiment_name, experiment_name, b))
+  output_filename = sprintf("%s/precomp/%s/precomp_%s_%d.tsv", 
+                           base_dir, experiment_name, experiment_name, b) 
+  write_tsv(as_tibble(V_hat), path = output_filename)
+  call_info = sprintf("#\n#\n### FUNCTION CALL: ###\n# run_one_precomputation(experiment_name = \"%s\", b = %d, base_dir = \"%s\")", 
+                      experiment_name, b, base_dir)
+  write(call_info, filename, append = TRUE)
+  add_git_info(output_filename)
+  add_R_session_info(output_filename)
 }
