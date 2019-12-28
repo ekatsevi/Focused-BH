@@ -16,8 +16,7 @@ load_silently = function(packages){
 
 load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry", 
                 "structSSI", "igraph", "ape", "R.utils", "reshape2", 
-                "tidyverse", "Matrix"))
-
+                "tidyverse", "Matrix", "multtest"))
 
 # download data and run preprocessing
 system(sprintf("./download_GO_data.sh %s", base_dir))
