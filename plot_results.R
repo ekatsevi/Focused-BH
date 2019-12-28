@@ -1,5 +1,5 @@
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
-experiment_name = "GO_Simes"
+experiment_name = "PheWAS_Fisher"
 results_dir = sprintf("%s/results/%s", base_dir, experiment_name)
 results_files = list.files(results_dir)
 results = vector("list", length(results_files))
@@ -11,9 +11,11 @@ for(index in 1:length(results_files)){
 df_results = do.call("rbind", results)
 df_results = df_results %>% mutate(method = factor(method, 
                                       levels = c("BH", "Focused_BH_original", 
-                                                 "Focused_BH_permutation", "Structured_Holm"),
+                                                 "Focused_BH_permutation", "Structured_Holm",
+                                                 "Yekutieli"),
                                       labels = c("BH", "Focused BH (original)", 
-                                                 "Focused BH (permutation)", "Structured Holm")),
+                                                 "Focused BH (permutation)", "Structured Holm",
+                                                 "Yekutieli")),
                       metric = factor(metric, 
                                       levels = c("fdp", "power"), 
                                       labels = c("False discovery rate", "Number of filtered discoveries"))) %>%
@@ -22,7 +24,7 @@ df_results = df_results %>% mutate(method = factor(method,
 p = df_results %>%
   ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
   geom_line() + geom_point() + 
-  scale_colour_manual(values = c("firebrick1", "dodgerblue", "blue", "darkgoldenrod")) + 
+  scale_colour_manual(values = c("firebrick1", "dodgerblue", "blue", "darkgoldenrod", "purple")) + 
   geom_hline(data = tibble(metric = "False discovery rate", q = 0.1), 
              aes(yintercept = q), linetype = "dashed") + 
   geom_errorbar(data = df_results %>% filter(metric == "False discovery rate"),
@@ -31,5 +33,5 @@ p = df_results %>%
   facet_wrap(metric ~ ., scales = "free") + theme_bw() + xlab("Signal strength") +
   theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")
 plot(p)
-plot_filename = sprintf("%s/REVIGO_experiment.pdf", figures_dir)
-ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 3.5)
+# plot_filename = sprintf("%s/REVIGO_experiment.pdf", figures_dir)
+# ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 3.5)

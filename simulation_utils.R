@@ -38,7 +38,8 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   # precomputation for Yekutieli
   if("Yekutieli" %in% methods){
     depths = get_depths(G$Pa)
-    q_Yekutieli = q/(2*max(depths)) # corrected FDR target level 
+    q_Yekutieli = q/(2*(1+max(depths))) # corrected FDR target level, 
+                                        # 1 to account for imaginary root node
   }
   
   # run all methods for each setting of parameters 
