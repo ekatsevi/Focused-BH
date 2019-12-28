@@ -95,12 +95,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     }
     
     if("Yekutieli" %in% methods){
-      unadj.p.values = c(P, 0)
-      names(unadj.p.values) = sapply(1:(m+1), as.character)
-      hyp.tree = hFDR.adjust(unadj.p.values, G_Yekutieli, q_Yekutieli)
-      R = hyp.tree@p.vals[[2]] <= q_Yekutieli
-      R[is.na(R)] = FALSE
-      rejections["Yekutieli",] = R[1:m]
+      rejections["Yekutieli",] = Yekutieli(P, G_Yekutieli, q_Yekutieli)
     }
         
     fbh_methods = intersect(methods, c("Focused_BH_original", 
