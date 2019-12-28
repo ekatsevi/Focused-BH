@@ -150,7 +150,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   # add provenance information to output file
   call_info = sprintf("#\n#\n### FUNCTION CALL: ###\n# run_one_experiment(experiment_name = \"%s\", experiment_index = %d, base_dir = \"%s\")", 
                       experiment_name, experiment_index, base_dir)
-  write(call_info, filename, append = TRUE)
+  write(call_info, output_filename, append = TRUE)
   add_git_info(output_filename)
   add_R_session_info(output_filename)
 }
