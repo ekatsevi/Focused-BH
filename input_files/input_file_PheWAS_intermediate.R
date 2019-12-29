@@ -1,8 +1,8 @@
 suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
-reps_per_experiment = 100 
-reps = 100                         # Number of outer-loop repetitions
+reps_per_experiment = 250 
+reps = 250                         # Number of outer-loop repetitions
 # reps = 1
 methods = c("BH",                 # methods
             "Leaf_BH",
@@ -11,8 +11,8 @@ methods = c("BH",                 # methods
             "Yekutieli",
             "Structured_Holm")
 q = 0.1                           # FDR control level
-# signal_strength_vals = seq(1,7,by=0.5)
-signal_strength_vals = 4
+signal_strength_vals = seq(1,7,by=0.5)
+# signal_strength_vals = 4
 global_test = "Fisher"
 B = 100       # number of repetitions
 filter_name = "outer_nodes"

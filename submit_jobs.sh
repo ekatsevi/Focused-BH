@@ -5,9 +5,9 @@
 # Submit jobs for Focused BH
 
 # simulation parameters
-machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_name="PheWAS_intermediate_2"    # will define input file
-mode="batch"            # interactive or batch
+machine="local"                 # which machine it's running on (local, ubergenno, PSC)
+experiment_names=( "PheWAS_clustered" "PheWAS_intermediate" "PheWAS_dispersed" )    # will define input file
+mode="interactive"            # interactive or batch
 
 # set base directory depending on machine
 if [ $machine == "local" ]
@@ -21,6 +21,8 @@ else
 exit 1
 fi
 
+for experiment_name in "${experiment_names[@]}"
+do
 # paths to relevant files/directories
 input_filename="input_files/input_file_"$experiment_name".R"
 logs_dir=$base_dir"/logs/"$experiment_name
@@ -37,30 +39,31 @@ fi
 num_experiments=$(Rscript $input_filename num_experiments)
 for (( experiment_index=1; experiment_index<=$num_experiments; experiment_index++ ))
 do
-  echo "Submitting job for experiment number "$experiment_index
-  command="./run_one_experiment.sh $experiment_name $experiment_index $base_dir $machine"
-  logs_filename=$logs_dir"/"$experiment_name"_"$experiment_index".Rout"
-  # construct final call based on machine
-  if [ $machine == "local" ] 
-  then
-    if [ $mode == "batch" ] 
-    then
-    $command > $logs_filename 2> $logs_filename &
-    fi
-    if [ $mode == "interactive" ] 
-    then
-    $command
-    fi
-  fi
-  if [ $machine == "PSC" ]
-  then
-    if [ $mode == "batch" ] 
-    then
-      sbatch --time=00:30:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
-    fi
-    if [ $mode == "interactive" ] 
-    then
-      $command
-    fi
-  fi
+  echo "Submitting job for experiment "$experiment_name", number "$experiment_index
+  # command="./run_one_experiment.sh $experiment_name $experiment_index $base_dir $machine"
+  # logs_filename=$logs_dir"/"$experiment_name"_"$experiment_index".Rout"
+  # # construct final call based on machine
+  # if [ $machine == "local" ] 
+  # then
+  #   if [ $mode == "batch" ] 
+  #   then
+  #   $command > $logs_filename 2> $logs_filename &
+  #   fi
+  #   if [ $mode == "interactive" ] 
+  #   then
+  #   $command
+  #   fi
+  # fi
+  # if [ $machine == "PSC" ]
+  # then
+  #   if [ $mode == "batch" ] 
+  #   then
+  #     sbatch --time=01:30:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+  #   fi
+  #   if [ $mode == "interactive" ] 
+  #   then
+  #     $command
+  #   fi
+  # fi
+done
 done
