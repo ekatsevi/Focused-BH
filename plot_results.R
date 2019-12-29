@@ -1,5 +1,6 @@
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
-experiment_name = "PheWAS_Fisher"
+# experiment_name = "PheWAS_clustered"
+experiment_name = "PheWAS_dispersed"
 results_dir = sprintf("%s/results/%s", base_dir, experiment_name)
 results_files = list.files(results_dir)
 results = vector("list", length(results_files))
@@ -10,11 +11,17 @@ for(index in 1:length(results_files)){
 }
 df_results = do.call("rbind", results)
 df_results = df_results %>% mutate(method = factor(method, 
-                                      levels = c("BH", "Focused_BH_original", 
-                                                 "Focused_BH_permutation", "Structured_Holm",
+                                      levels = c("BH", 
+                                                 "Focused_BH_original", 
+                                                 "Leaf_BH",
+                                                 # "Focused_BH_permutation", 
+                                                 "Structured_Holm",
                                                  "Yekutieli"),
-                                      labels = c("BH", "Focused BH (original)", 
-                                                 "Focused BH (permutation)", "Structured Holm",
+                                      labels = c("BH", 
+                                                 "Focused BH", 
+                                                 "Leaf BH",
+                                                 # "Focused BH (permutation)", 
+                                                 "Structured Holm",
                                                  "Yekutieli")),
                       metric = factor(metric, 
                                       levels = c("fdp", "power"), 
