@@ -48,7 +48,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     rep = parameters$rep[index] 
     signal_strength = parameters$signal_strength[index]
 
-    set.seed(1234+1000*experimend_index + rep) # for reproducibility; should vary by rep
+    set.seed(1234+1000*experiment_index + rep) # for reproducibility; should vary by rep
     
     # create effect sizes based on signal strength and non-null items
     beta = numeric(num_items)

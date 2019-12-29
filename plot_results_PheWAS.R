@@ -1,3 +1,5 @@
+machine = "local"
+source("setup.R")
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
 # experiment_name = "PheWAS_clustered"
 experiment_names = c("PheWAS_clustered", "PheWAS_intermediate", "PheWAS_dispersed")
@@ -18,17 +20,17 @@ for(experiment_idx in 1:length(experiment_names)){
 }
 df_results_all = do.call("rbind", results_all)
 
-df_results_all = df_results_all %>% filter(method != "Leaf_BH")
+# df_results_all = df_results_all %>% filter(method != "Leaf_BH")
 df_results_all = df_results_all %>% mutate(method = factor(method, 
                                                    levels = c("BH", 
                                                               "Focused_BH_original", 
-                                                              # "Leaf_BH",
+                                                              "Leaf_BH",
                                                               # "Focused_BH_permutation", 
                                                               "Structured_Holm",
                                                               "Yekutieli"),
                                                    labels = c("BH", 
                                                               "Focused BH", 
-                                                              # "Leaf BH",
+                                                              "Leaf BH",
                                                               # "Focused BH (permutation)",
                                                               "Structured Holm",
                                                               "Yekutieli")),
@@ -44,7 +46,7 @@ p = df_results_all %>% filter(signal_strength <= Inf) %>%
   ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
   geom_line() + geom_point() + 
   scale_colour_manual(values = c("firebrick1", "dodgerblue", 
-                                  # "blue", 
+                                  "blue",
                                  "darkgoldenrod", "purple")) + 
   geom_hline(data = tibble(metric = factor("False discovery rate", levels = c("Number of discoveries", "False discovery rate")), q = 0.1),
              aes(yintercept = q), linetype = "dashed") +
