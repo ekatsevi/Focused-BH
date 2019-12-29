@@ -5,9 +5,9 @@
 # Submit jobs for Focused BH
 
 # simulation parameters
-machine="local"                 # which machine it's running on (local, ubergenno, PSC)
+machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
 experiment_names=( "PheWAS_clustered" "PheWAS_intermediate" "PheWAS_dispersed" )    # will define input file
-mode="interactive"            # interactive or batch
+mode="batch"            # interactive or batch
 
 # set base directory depending on machine
 if [ $machine == "local" ]
