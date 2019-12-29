@@ -38,8 +38,9 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
   # precomputation for Yekutieli
   if("Yekutieli" %in% methods){
     depths = get_depths(G$Pa)
-    q_Yekutieli = q/(2*(1+max(depths))) # corrected FDR target level, 
-                                        # 1 to account for imaginary root node
+    q_Yekutieli = q/(2*max(depths)) # corrected FDR target level based on 
+                                    # Proposition 1 of Yekutieli (2008)
+                                       
   }
   
   # run all methods for each setting of parameters 
@@ -79,6 +80,11 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     # BH
     if("BH" %in% methods){
       rejections["BH",] = p.adjust(P, "fdr") <= q
+    }
+    
+    # Leaf BH
+    if("Leaf_BH" %in% methods){
+      rejections["Leaf_BH",leaves] = p.adjust(P[leaves], "fdr") <= q
     }
         
     # Storey-BH

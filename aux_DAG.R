@@ -33,7 +33,7 @@ FocusedBH_outer_nodes = function(P, G, q, V_hats = NULL){
     rejections[index,] = P <= P_aug[idx]
   }
   if(num_V_hats == 1){
-    rejections = as.numeric(rejections)
+    rejections = as.logical(rejections)
   }
   return(rejections)
 }
@@ -95,7 +95,7 @@ FocusedBH = function(filter_name, P, G, q, V_hats = NULL){
     }
   }
   if(num_V_hats == 1){
-    rejections = as.numeric(rejections)
+    rejections = as.logical(rejections)
   }
   return(rejections)
 }
@@ -364,6 +364,31 @@ get_heights = function(C){
     }
   }
   return(heights)  
+}
+
+# for each node, get the root node above it (only for trees)
+get_root_nodes = function(Pa){
+  m = length(Pa)
+  root_nodes = numeric(m)
+  while(TRUE){
+    done = TRUE
+    for(j in 1:m){
+      if(root_nodes[j] == 0){
+        done = FALSE
+        if(length(Pa[[j]]) == 0){
+          root_nodes[j] = j
+        } else{
+          if(root_nodes[Pa[[j]]] > 0){
+            root_nodes[j] = root_nodes[Pa[[j]]]
+          }          
+        }
+      }
+    }
+    if(done){
+      break
+    }
+  }
+  return(root_nodes) 
 }
 
 # get the number of descendants of each node that are

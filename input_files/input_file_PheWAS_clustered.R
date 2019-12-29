@@ -7,12 +7,12 @@ reps = 100                         # Number of outer-loop repetitions
 methods = c("BH",                 # methods
             "Leaf_BH",
             "Focused_BH_original",   
-            "Focused_BH_permutation",
+            # "Focused_BH_permutation",
             "Yekutieli",
             "Structured_Holm")
 q = 0.1                           # FDR control level
 signal_strength_vals = seq(1,7,by=0.5)
-# signal_strength_vals = 6
+# signal_strength_vals = 4
 global_test = "Fisher"
 B = 100       # number of repetitions
 filter_name = "outer_nodes"
@@ -78,25 +78,23 @@ if(input_mode %in% c("precomputation", "experiment")){
   
   
   node_depths = get_depths(G$Pa)
+  node_heights = get_heights(G$C)
   leaves = sapply(G$C, length) == 0
-  num_deep_leaves = get_num_marked_descendants(G$C,  leaves & node_depths == 5)
-  num_leaves = get_num_marked_descendants(G$C,  leaves)
-  root_nodes = get_root_nodes(G$Pa)
-  max_node_depths = sapply(which(node_depths == 1), 
-                           function(root_node)(max(node_depths[root_nodes == root_node])))
-  roots = which(node_depths == 1)
+  # num_deep_leaves = get_num_marked_descendants(G$C,  leaves & node_depths == 5)
+  # num_leaves = get_num_marked_descendants(G$C,  leaves)
+  # root_nodes = get_root_nodes(G$Pa)
+  # max_node_depths = sapply(which(node_depths == 1), 
+  #                          function(root_node)(max(node_depths[root_nodes == root_node])))
+  # roots = which(node_depths == 1)
+  # subtree_info = tibble(root = roots, 
+  #                       depth = sapply(roots, function(root_node)(max(node_depths[root_nodes == root_node]))), 
+  #                       max_leaves = sapply(1:length(roots), function(idx)(max(num_leaves[root_nodes == roots[idx] & node_depths == max_node_depths[idx] - 1]))),
+  #                       num_leaves = num_leaves[roots])
   
-  subtree_info = tibble(root = roots, 
-                        depth = sapply(roots, function(root_node)(max(node_depths[root_nodes == root_node]))), 
-                        max_leaves = sapply(1:length(roots), function(idx)(max(num_leaves[root_nodes == roots[idx] & node_depths == max_node_depths[idx] - 1]))),
-                        num_leaves = num_leaves[roots])
-  # sample 5 "anchor nodes" (ICD codes) with 10
-  anchor_nodes = withSeed(sample(which(10 <= num_deep_leaves &
-                                         num_deep_leaves <= 20 & node_depths == 3), 10), 1)
-
+  anchor_node = which(items_per_node == 50 & node_depths == 2 & node_heights == 4)
+  
   # define the genes belonging to the anchor terms non-null
-  nonnull_items = unique(unlist(lapply(G$sets[anchor_nodes], 
-                                       function(set)(withSeed(sample(set, 5),1)))))
+  nonnull_items = G$sets[[anchor_node]]
   
   # for(anchor_node in anchor_nodes){
   #   cat(sprintf("ANCHOR NODE\n"))
