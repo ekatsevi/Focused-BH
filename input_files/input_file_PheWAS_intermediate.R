@@ -91,12 +91,14 @@ if(input_mode %in% c("precomputation", "experiment")){
   #                       max_leaves = sapply(1:length(roots), function(idx)(max(num_leaves[root_nodes == roots[idx] & node_depths == max_node_depths[idx] - 1]))),
   #                       num_leaves = num_leaves[roots])
   
-  # nonnull_roots = withSeed(sample(roots, 10),1)
-  nonnull_roots = withSeed(sample(roots, 7),1)
+  nonnull_roots = withSeed(sample(roots, 10),1)
+  anchor_nodes = unlist(sapply(nonnull_roots, 
+                               function(nonnull_root)(withSeed(sample(which(root_nodes == nonnull_root & num_leaves == 5),1),1))))
+  # nonnull_roots = withSeed(sample(roots, 7),1)
   # intermediate_nodes = num_leaves == 5 # & node_depths == 4 # & node_heights == 1
-  anchor_nodes = unlist(sapply(nonnull_roots[1:6], 
-                        function(nonnull_root)(withSeed(sample(which(root_nodes == nonnull_root & num_leaves == 7),1),1))))
-  anchor_nodes = c(anchor_nodes, withSeed(sample(which(root_nodes == nonnull_roots[7] & num_leaves == 8),1),1))
+  # anchor_nodes = unlist(sapply(nonnull_roots[1:6], 
+  #                       function(nonnull_root)(withSeed(sample(which(root_nodes == nonnull_root & num_leaves == 7),1),1))))
+  # anchor_nodes = c(anchor_nodes, withSeed(sample(which(root_nodes == nonnull_roots[7] & num_leaves == 8),1),1))
   # define the genes belonging to the anchor terms non-null
   nonnull_items = unlist(G$sets[anchor_nodes])
   
