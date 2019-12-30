@@ -20,50 +20,51 @@ for(experiment_idx in 1:length(experiment_names)){
 }
 df_results_all = do.call("rbind", results_all)
 
-# df_results_all = df_results_all %>% filter(method != "Leaf_BH")
+df_results_all = df_results_all %>% filter(method != "Leaf_BH")
 df_results_all = df_results_all %>% mutate(method = factor(method, 
                                                    levels = c("BH", 
                                                               "Focused_BH_original", 
-                                                              "Leaf_BH",
-                                                              # "Focused_BH_permutation", 
+                                                              # "Leaf_BH",
+                                                              # "Focused_BH_permutation",
                                                               "Structured_Holm",
                                                               "Yekutieli"),
                                                    labels = c("BH", 
                                                               "Focused BH", 
-                                                              "Leaf BH",
+                                                              # "Leaf BH",
                                                               # "Focused BH (permutation)",
                                                               "Structured Holm",
                                                               "Yekutieli")),
                                    metric = factor(metric, 
                                                    levels = c("power", "fdp"), 
-                                                   labels = c("Number of discoveries", "False discovery rate")),
+                                                   labels = c("True discoveries", "False discovery rate")),
                                    experiment = factor(experiment,
                                                        levels = experiment_names,
                                                        labels = c("Clustered", "Intermediate", "Dispersed"))) %>%
   group_by(method, metric, experiment, signal_strength) %>%
   summarise(value_mean = mean(value), value_se = sd(value)/sqrt(n()))
-p = df_results_all %>% filter(signal_strength <= Inf) %>%
+p = df_results_all %>% filter(signal_strength <= 6) %>%
   ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
   geom_line() + geom_point() + 
   scale_colour_manual(values = c("firebrick1", "dodgerblue", 
-                                  "blue",
-                                 "darkgoldenrod", "purple")) + 
-  geom_hline(data = tibble(metric = factor("False discovery rate", levels = c("Number of discoveries", "False discovery rate")), q = 0.1),
+                                  "darkorange2",
+                                 # "darkgoldenrod", 
+                                 "purple")) + 
+  geom_hline(data = tibble(metric = factor("False discovery rate", levels = c("True discoveries", "False discovery rate")), q = 0.1),
              aes(yintercept = q), linetype = "dashed") +
-  geom_errorbar(data = df_results_all %>% filter(metric == "False discovery rate", signal_strength <= Inf),
-                aes(ymin = value_mean - value_se, ymax = value_mean + value_se), 
+  geom_errorbar(data = df_results_all %>% filter(metric == "False discovery rate", signal_strength <= 6),
+                aes(ymin = value_mean - 2*value_se, ymax = value_mean + 2*value_se), 
                 width = 0.2) + 
   facet_grid(metric ~ experiment, scales = "free_y") + theme_bw() + xlab("Signal strength") +
   theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")
 plot(p)
-# plot_filename = sprintf("%s/PheWAS_experiment.pdf", figures_dir)
-# ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 4)
+plot_filename = sprintf("%s/PheWAS_experiment.pdf", figures_dir)
+ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 4.25)
 
-df_results_all %>% filter(signal_strength <= 3.5, metric == "Number of discoveries", experiment == "Intermediate") %>%
-  ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
-  geom_line() + geom_point() + 
-  scale_colour_manual(values = c("firebrick1", "dodgerblue", 
-                                 "blue",
-                                 "darkgoldenrod", "purple")) + 
-  theme_bw() + xlab("Signal strength") +
-  theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")
+# df_results_all %>% filter(signal_strength <= 3.5, metric == "Number of discoveries", experiment == "Intermediate") %>%
+#   ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
+#   geom_line() + geom_point() + 
+#   scale_colour_manual(values = c("firebrick1", "dodgerblue", 
+#                                  "blue",
+#                                  "darkgoldenrod", "purple")) + 
+#   theme_bw() + xlab("Signal strength") +
+#   theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")

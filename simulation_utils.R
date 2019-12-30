@@ -22,7 +22,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     null_V_hats = vector("list", B)
     for(b in 1:B){
         precomp_filename = sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b])
-        V_hat = read_tsv(precomp_filename, col_types = "di", comment = "#")
+        V_hat = read_tsv(precomp_filename, comment = "#")
         V_hat$b = b
         null_V_hats[[b]] = V_hat %>% filter(pvalue <= q)
     }
@@ -105,11 +105,13 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       rejections["Yekutieli",] = Yekutieli(P, G_Yekutieli, q_Yekutieli)
     }
     
-    for(height in 1:max(node_heights)){
-      leaf_bh_method = sprintf("Leaf_BH_%d", height)
-      if(leaf_bh_method %in% methods){
-        nodes_at_height = node_heights == height
-        rejections[leaf_bh_method,nodes_at_height] = p.adjust(P[nodes_at_height], "fdr") <= q
+    if(exists("node_heights")){
+      for(height in 1:max(node_heights)){
+        leaf_bh_method = sprintf("Leaf_BH_%d", height)
+        if(leaf_bh_method %in% methods){
+          nodes_at_height = node_heights == height
+          rejections[leaf_bh_method,nodes_at_height] = p.adjust(P[nodes_at_height], "fdr") <= q
+        }
       }
     }
     

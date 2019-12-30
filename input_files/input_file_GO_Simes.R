@@ -2,14 +2,14 @@ suppressPackageStartupMessages(library(tidyverse))
 
 ### set top-level parameters
 reps_per_experiment = 25
-reps = 100                         # Number of outer-loop repetitions
+reps = 250                         # Number of outer-loop repetitions
 # reps = 1
 methods = c("BH",                 # methods
             "Focused_BH_original",   
             "Focused_BH_permutation",
             "Structured_Holm")
 q = 0.1                           # FDR control level
-signal_strength_vals = seq(1,7,by=0.5)
+signal_strength_vals = seq(1,6,by=0.5)
 # signal_strength_vals = 6
 global_test = "Simes"
 k_max = 350   # maximum p-value threshold considered by permutation approach

@@ -417,3 +417,23 @@ get_num_marked_descendants = function(C, marked){
   }
   return(num_marked_descendants)  
 }
+
+plot_tree = function(G, vertex_shapes, frame_colors, fill_colors, vertex_labels, vertex_size){
+  library(igraph)
+  m = G$m
+  children = G$C
+  parents = G$Pa
+  edges = c()
+  for(j in 1:m){
+    for(child in children[[j]]){
+      edges = c(edges, j, child)
+    }
+  }
+  g<-graph(edges, n=m, directed=TRUE)
+  roots = which(sapply(G$Pa, length) == 0)
+  
+  par(mar=c(0,0,1,0)) # make smaller margins
+  plot(g, size = vertex_size, vertex.label = vertex_labels, vertex.size = vertex_size, vertex.color = fill_colors, vertex.shape = vertex_shapes,
+       vertex.frame.color = frame_colors, layout = layout_as_tree(g, root = roots), asp = 0)
+  par(mar=c(5.1, 4.1, 4.1, 2.1)) # reset margins
+}

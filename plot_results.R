@@ -2,7 +2,7 @@ machine = "local"
 source("setup.R")
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
 # experiment_name = "PheWAS_clustered"
-experiment_name = "PheWAS_intermediate_2"
+experiment_name = "PheWAS_intermediate_leaf"
 results_dir = sprintf("%s/results/%s", base_dir, experiment_name)
 results_files = list.files(results_dir)
 results = vector("list", length(results_files))

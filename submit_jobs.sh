@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_names=( "PheWAS_intermediate_leaf" )    # will define input file
+experiment_names=( "GO_Simes" )    # will define input file
 mode="batch"            # interactive or batch
 
 # set base directory depending on machine
@@ -58,7 +58,7 @@ do
   then
     if [ $mode == "batch" ]
     then
-      sbatch --time=01:30:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
+      sbatch --time=05:00:00 -p RM-shared -J $experiment_index"_"$experiment_name -o $logs_filename $command
     fi
     if [ $mode == "interactive" ]
     then
