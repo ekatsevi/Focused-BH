@@ -1,3 +1,5 @@
+machine = "local"
+source("setup.R")
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
 # experiment_name = "PheWAS_clustered"
 experiment_name = "PheWAS_intermediate_2"

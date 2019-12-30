@@ -6,7 +6,7 @@
 
 # simulation parameters
 machine="PSC"                 # which machine it's running on (local, ubergenno, PSC)
-experiment_names=( "PheWAS_clustered" "PheWAS_intermediate" "PheWAS_dispersed" )    # will define input file
+experiment_names=( "PheWAS_intermediate_leaf" )    # will define input file
 mode="batch"            # interactive or batch
 
 # set base directory depending on machine

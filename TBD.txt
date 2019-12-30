@@ -1,5 +1,5 @@
 - add zeros to GO_Simes precomputation
 - consider making a plot where REVIGO and outer nodes V_hat are on the same plot
 - finish REVIGO data analysis
-- do PheWAS numerical experiment
-- do PheWAS data analysis, including permutation Focused BH
+- finish PheWAS numerical experiment
+- do PheWAS data analysis, potentially including permutation Focused BH

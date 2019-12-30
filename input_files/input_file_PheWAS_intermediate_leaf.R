@@ -4,14 +4,12 @@ suppressPackageStartupMessages(library(tidyverse))
 reps_per_experiment = 250 
 reps = 250                         # Number of outer-loop repetitions
 # reps = 1
-methods = c("BH",                 # methods
-            "Leaf_BH",
-            "Focused_BH_original",   
-            # "Focused_BH_permutation",
-            "Yekutieli",
-            "Structured_Holm")
+methods = c("Focused_BH_original",   
+            "Leaf_BH_1", 
+            "Leaf_BH_2",
+            "Leaf_BH_3")
 q = 0.1                           # FDR control level
-signal_strength_vals = c(seq(1,3.5,by=0.25), seq(4,7, by = 0.5))
+signal_strength_vals = seq(1,7,by=0.5)
 # signal_strength_vals = 4
 global_test = "Fisher"
 B = 100       # number of repetitions

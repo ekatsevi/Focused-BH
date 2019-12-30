@@ -56,5 +56,14 @@ p = df_results_all %>% filter(signal_strength <= Inf) %>%
   facet_grid(metric ~ experiment, scales = "free_y") + theme_bw() + xlab("Signal strength") +
   theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")
 plot(p)
-plot_filename = sprintf("%s/PheWAS_experiment.pdf", figures_dir)
-ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 4)
+# plot_filename = sprintf("%s/PheWAS_experiment.pdf", figures_dir)
+# ggsave(filename = plot_filename, plot = p, device = "pdf", width = 6, height = 4)
+
+df_results_all %>% filter(signal_strength <= 3.5, metric == "Number of discoveries", experiment == "Intermediate") %>%
+  ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
+  geom_line() + geom_point() + 
+  scale_colour_manual(values = c("firebrick1", "dodgerblue", 
+                                 "blue",
+                                 "darkgoldenrod", "purple")) + 
+  theme_bw() + xlab("Signal strength") +
+  theme(axis.title.y = element_blank(), legend.title = element_blank(), legend.position = "bottom")

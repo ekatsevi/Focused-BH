@@ -82,10 +82,10 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
       rejections["BH",] = p.adjust(P, "fdr") <= q
     }
     
-    # Leaf BH
-    if("Leaf_BH" %in% methods){
-      rejections["Leaf_BH",leaves] = p.adjust(P[leaves], "fdr") <= q
-    }
+    # # Leaf BH
+    # if("Leaf_BH" %in% methods){
+    #   rejections["Leaf_BH",leaves] = p.adjust(P[leaves], "fdr") <= q
+    # }
         
     # Storey-BH
     if("Storey_BH" %in% methods){
@@ -104,25 +104,35 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     if("Yekutieli" %in% methods){
       rejections["Yekutieli",] = Yekutieli(P, G_Yekutieli, q_Yekutieli)
     }
-        
+    
+    for(height in 1:max(node_heights)){
+      leaf_bh_method = sprintf("Leaf_BH_%d", height)
+      if(leaf_bh_method %in% methods){
+        nodes_at_height = node_heights == height
+        rejections[leaf_bh_method,nodes_at_height] = p.adjust(P[nodes_at_height], "fdr") <= q
+      }
+    }
+    
     fbh_methods = intersect(methods, c("Focused_BH_original", 
                                        "Focused_BH_permutation", 
                                        "Focused_BH_oracle"))
     
-    V_hats = vector("list", length(fbh_methods))
-    names(V_hats) = fbh_methods
-    
-    # Focused BH (original)
-    if("Focused_BH_original" %in% methods){
-      V_hats[["Focused_BH_original"]] = function(t)(m*t)
+    if(length(fbh_methods) > 0){
+      V_hats = vector("list", length(fbh_methods))
+      names(V_hats) = fbh_methods
+      
+      # Focused BH (original)
+      if("Focused_BH_original" %in% methods){
+        V_hats[["Focused_BH_original"]] = function(t)(m*t)
+      }
+  
+      # Focused BH (permutation)
+      if("Focused_BH_permutation" %in% methods){
+        V_hats[["Focused_BH_permutation"]] = V_hat_permutation
+      }
+      
+      rejections[fbh_methods,] = FocusedBH(filter_name, P, G, q, V_hats)
     }
-
-    # Focused BH (permutation)
-    if("Focused_BH_permutation" %in% methods){
-      V_hats[["Focused_BH_permutation"]] = V_hat_permutation
-    }
-    
-    rejections[fbh_methods,] = FocusedBH(filter_name, P, G, q, V_hats)
     
     # Filter the results
     for(method in methods){
