@@ -1,7 +1,0 @@
-- code
-	- update code on Github
-	- figure out the logic with people not having the UKBB data
-	- add enclosing src folder
-
-- at revision stage
-	- including permutation Focused BH in real data analyses; https://bioconductor.org/packages/devel/data/experiment/manuals/cancerdata/man/cancerdata.pdf for original gene expression data

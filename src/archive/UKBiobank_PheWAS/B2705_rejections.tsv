@@ -1,0 +1,39 @@
+ICD-10 term	p-value	outer_node	FBH
+M45 Ankylosing spondylitis	6.6580968180152706e-149	TRUE	TRUE
+M45.X9 Ankylosing spondylitis (Site unspecified)	4.4752207018990236e-104	TRUE	TRUE
+M45-M49 Spondylopathies	2.153350477579152e-14	FALSE	TRUE
+H40.5 Glaucoma secondary to other eye disorders	3.5089274487628597e-13	TRUE	TRUE
+M06 Other rheumatoid arthritis	5.697602088229095e-12	FALSE	TRUE
+L40.5 Arthropathic psoriasis	2.2888198659211778e-11	TRUE	TRUE
+H20.9 Iridocyclitis, unspecified	2.442845950824875e-11	TRUE	TRUE
+G31.8 Other specified degenerative diseases of nervous system	3.4314786306162214e-11	TRUE	TRUE
+M05-M14 Inflammatory polyarthropathies	4.951863009365206e-11	FALSE	TRUE
+H52.0 Hypermetropia	7.699152726040855e-11	TRUE	TRUE
+T85.1 Mechanical complication of implanted electronic stimulator of nervous system	8.024754808161675e-11	TRUE	TRUE
+M06.9 Rheumatoid arthritis, unspecified	1.6130776265374002e-10	FALSE	TRUE
+S81.0 Open wound of knee	2.423899363132618e-10	TRUE	TRUE
+L40 Psoriasis	6.243697567386765e-9	FALSE	TRUE
+L40-L45 Papulosquamous disorders	6.043936824690063e-8	FALSE	TRUE
+H20 Iridocyclitis	2.633041953753704e-7	FALSE	TRUE
+M00-M03 Infectious arthropathies	1.2002651204560824e-6	TRUE	TRUE
+M06.91 Rheumatoid arthritis, unspecified (Shoulder region)	1.596836936915128e-6	TRUE	TRUE
+M06.94 Rheumatoid arthritis, unspecified (Hand)	5.3628800269181025e-6	TRUE	TRUE
+O42.9 Premature rupture of membranes, unspecified	7.478893864743637e-6	TRUE	TRUE
+L03.8 Cellulitis of other sites	2.4555418770606938e-5	TRUE	TRUE
+I86 Varicose veins of other sites	4.0010232764012835e-5	FALSE	TRUE
+M65.8 Other synovitis and tenosynovitis	4.829359915351681e-5	TRUE	TRUE
+H52 Disorders of refraction and accommodation	1.1683573848859897e-4	FALSE	TRUE
+I51.7 Cardiomegaly	1.3058430525776275e-4	TRUE	TRUE
+D21 Other benign neoplasms of connective and other soft tissue	1.3113533667546216e-4	TRUE	TRUE
+Chapter XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified	1.4270062485372567e-4	TRUE	TRUE
+M06.90 Rheumatoid arthritis, unspecified (Multiple sites)	1.498852354511417e-4	TRUE	TRUE
+J38.0 Paralysis of vocal cords and larynx	2.155374951247092e-4	TRUE	TRUE
+G31 Other degenerative diseases of nervous system, not elsewhere classified	2.3308657732988182e-4	FALSE	TRUE
+J32 Chronic sinusitis	2.721849690461282e-4	TRUE	TRUE
+G62.8 Other specified polyneuropathies	2.859833152353144e-4	TRUE	TRUE
+G03.9 Meningitis, unspecified	2.881683360908606e-4	TRUE	TRUE
+I86.1 Scrotal varices	3.09189025924921e-4	TRUE	TRUE
+T43.2 Other and unspecified antidepressants	4.3231582590591794e-4	TRUE	FALSE
+L50 Urticaria	4.544493863181154e-4	TRUE	FALSE
+G40.2 Localisation-related (focal) (partial) symptomatic epilepsy and epileptic syndromes with complex partial seizures	4.7532316965898753e-4	TRUE	FALSE
+H81.0 Meniere's disease	5.530537509342169e-4	TRUE	FALSE

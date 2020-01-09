@@ -1,0 +1,54 @@
+   coding meaning                                              node_id parent_id selectable
+    <dbl> <chr>                                                  <dbl>     <dbl> <chr>     
+ 1     -1 dermatology                                             1510      1078 N         
+ 2     -1 gynaecology/breast                                      1079         0 N         
+ 3     -1 cardiovascular                                          1071         0 N         
+ 4     -1 musculoskeletal/trauma                                  1077         0 N         
+ 5     -1 bowel problem                                           1155      1073 N         
+ 6     -1 haematology/dermatology                                 1078         0 N         
+ 7     -1 gastrointestinal/abdominal                              1073         0 N         
+ 8     -1 fracture                                                1695      1077 N         
+ 9     -1 neurology                                               1265      1076 N         
+10     -1 neurology/eye/psychiatry                                1076         0 N         
+11     -1 respiratory/ent                                         1072         0 N         
+12     -1 fracture pelvis & lower limb                            1720      1695 N         
+13     -1 endocrine/diabetes                                      1075         0 N         
+14     -1 ent disorder/not cancer                                 1466      1072 N         
+15   1067 peripheral vascular disease                             1084      1071 Y         
+16   1136 liver/biliary/pancreas problem                          1156      1073 Y         
+17   1159 bile duct disease                                       1180      1156 Y         
+18   1220 diabetes                                                1245      1075 Y         
+19   1224 thyroid problem (not cancer)                            1249      1075 Y         
+20   1226 hypothyroidism/myxoedema                                1251      1249 Y         
+21   1242 eye/eyelid problem                                      1268      1076 Y         
+22   1243 psychological/psychiatric problem                       1269      1076 Y         
+23   1254 peripheral nerve disorder                               1280      1265 Y         
+24   1257 trapped nerve/compressed nerve                          1283      1280 Y         
+25   1258 chronic/degenerative neurological problem               1284      1265 Y         
+26   1261 multiple sclerosis                                      1287      1284 Y         
+27   1274 eye infection                                           1300      1268 Y         
+28   1275 retinal problem                                         1301      1268 Y         
+29   1290 deliberate self-harm/suicide attempt                    1316      1269 Y         
+30   1294 back problem                                            1320      1077 Y         
+31   1295 joint disorder                                          1321      1077 Y         
+32   1311 spine arthritis/spondylitis                             1350      1320 Y         
+33   1313 ankylosing spondylitis                                  1352      1320 Y         
+34   1344 stevens johnson syndrome                                1386      1513 Y         
+35   1348 gynaecological disorder (not cancer)                    1390      1079 Y         
+36   1397 other demyelinating disease (not multiple sclerosis)    1442      1284 Y         
+37   1413 nasal/sinus disorder                                    1467      1466 Y         
+38   1416 chronic sinusitis                                       1470      1467 Y         
+39   1452 eczema/dermatitis                                       1511      1510 Y         
+40   1454 blistering/desquamating skin disorder                   1513      1510 Y         
+41   1456 malabsorption/coeliac disease                           1516      1155 Y         
+42   1459 colitis/not crohns or ulcerative colitis                1519      1155 Y         
+43   1464 rheumatoid arthritis                                    1524      1321 Y         
+44   1477 psoriatic arthropathy                                   1540      1321 Y         
+45   1492 aortic aneurysm                                         1555      1084 Y         
+46   1527 retinitis pigmentosa                                    1590      1301 Y         
+47   1530 iritis                                                  1593      1268 Y         
+48   1553 cervical problem                                        1616      1390 Y         
+49   1555 cervical polyps                                         1618      1616 Y         
+50   1592 aortic dissection                                       1658      1555 Y         
+51   1654 fracture foot                                           1728      1720 Y         
+52   1655 fracture metatarsal                                     1729      1728 Y   
