@@ -1,5 +1,7 @@
-- add zeros to GO_Simes precomputation
-- consider making a plot where REVIGO and outer nodes V_hat are on the same plot
-- finish REVIGO data analysis
-- finish PheWAS numerical experiment
-- do PheWAS data analysis, potentially including permutation Focused BH
+- code
+	- update code on Github
+	- figure out the logic with people not having the UKBB data
+	- add enclosing src folder
+
+- at revision stage
+	- including permutation Focused BH in real data analyses; https://bioconductor.org/packages/devel/data/experiment/manuals/cancerdata/man/cancerdata.pdf for original gene expression data

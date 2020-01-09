@@ -1,4 +1,0 @@
-- Filter out related and/or non-European individuals?
-- Pre-compute permutation stuff
-- Is there a duplicated node you need to take care of? 
-

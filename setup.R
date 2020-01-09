@@ -1,10 +1,11 @@
-# paths
-if(machine == "local"){
-  base_dir = "/home/ekatsevi/project-files/focused-bh"  
-}
-if(machine == "PSC"){
-  base_dir="/pylon5/ms5piap/ekatsevi/focused-bh"
-}
+# source files containing functions
+source("methodology/Yekutieli.R")
+source("methodology/FocusedBH.R")
+source("methodology/utils_DAG.R")
+source("simulations/run_one_experiment.R")
+source("simulations/run_one_precomputation.R")
+source("utils/utils_provenance.R")
+source("utils/utils_setup.R")
 
 # load libraries
 load_silently = function(packages){
@@ -13,18 +14,17 @@ load_silently = function(packages){
   }
   invisible()
 }
-
 load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry", 
                 "structSSI", "igraph", "ape", "R.utils", "reshape2", 
-                "tidyverse", "Matrix", "multtest"))
+                "Matrix", "multtest", "ggraph", "kableExtra",
+                "janitor", "VennDiagram", "tidyverse"))
 
-# download data and run preprocessing
+# set paths
+source("utils/set_base_dir.R")
+  
+# download data, if not already done
 system(sprintf("./download_GO_data.sh %s", base_dir))
-source("parse_GO_files.R")
-source("parse_ICD_files.R") # TBD: make a download script for this and integrate it into the file itself
 
-# auxiliary functions
-source("aux_DAG.R")
-source("Yekutieli.R")
-source("simulation_utils.R")
-source("utils_provenance.R")
+# parse GO and UKBB data, if not already done
+source("parse_GO_data.R")
+source("parse_UKBB_data.R")

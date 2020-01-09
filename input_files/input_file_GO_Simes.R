@@ -1,27 +1,29 @@
 suppressPackageStartupMessages(library(tidyverse))
 
-### set top-level parameters
-reps_per_experiment = 25
-reps = 250                         # Number of outer-loop repetitions
-# reps = 1
-methods = c("BH",                 # methods
+######### SIMULATION PARAMETERS ###################
+reps_per_experiment = 25               # number of repetitions per experiment
+reps = 250                             # total number of repetitions
+methods = c("BH",                      # methods to compare
             "Focused_BH_original",   
             "Focused_BH_permutation",
             "Structured_Holm")
-q = 0.1                           # FDR control level
-signal_strength_vals = seq(1,6,by=0.5)
-# signal_strength_vals = 6
-global_test = "Simes"
-k_max = 350   # maximum p-value threshold considered by permutation approach
-B = 100       # number of repetitions
-filter_name = "REVIGO"
+q = 0.1                                # FDR control level
+signal_strength_vals = seq(1,6,by=0.5) # signal strength
+global_test = "Simes"                  # global test to aggregate item-level p-values
+k_max = 350                            # maximum possible number of rejections
+B = 100                                # number of permutations 
+filter_name = "REVIGO"                 # filter
+
+# put parameter combinations into a data frame
 parameters = as_tibble(merge(1:reps, signal_strength_vals))
 names(parameters) = c("rep", "signal_strength")
 num_experiments = ceiling(reps*length(signal_strength_vals)/reps_per_experiment)
 parameters$experiment = 1:num_experiments
 
-### set input_mode (experiment, precomputation, num_experiments, num_precomputations)
-# TBD: write a function that does the following
+######### SET INPUT MODE ###################
+# Input mode is one of {"experiment", "precomputation", 
+# "num_experiments", "num_precomputations"} and determines
+# how this script behaves
 if(exists("input_mode")){
   stopifnot(input_mode %in% c("experiment", "precomputation"))
   if(input_mode == "experiment"){
@@ -45,15 +47,15 @@ if(exists("input_mode")){
   }
 }
 
-### define the graph
+######### DEFINE THE GRAPH AND NON-NULL STRUCTURE ###################
 if(input_mode %in% c("precomputation", "experiment")){
-  # read in GO data
-  GO_reduced_graph_100_file = sprintf("%s/data/processed/GO_reduced_graph_100.Rda", base_dir)
+  # read in GO graph
+  GO_reduced_graph_100_file = sprintf("%s/data/processed/GO/GO_reduced_graph_100.Rda", base_dir)
   load(GO_reduced_graph_100_file)
 
+  # create adjacency matrix between genes and GO terms
   num_items = G$num_items
   m = G$m
-  # create adjacency matrix between genes and GO terms
   adj_matrix = matrix(FALSE, num_items, m)
   for(node in 1:m){
     genes_in_node = G$sets[[node]]

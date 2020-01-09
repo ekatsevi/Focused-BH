@@ -1,5 +1,4 @@
 archive/*
-*.tsv
 .Rhistory
 .RData
-
+TBD.txt
