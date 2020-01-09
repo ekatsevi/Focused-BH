@@ -1,4 +1,5 @@
 archive/*
+src/archive/*
 .Rhistory
 .RData
 TBD.txt
