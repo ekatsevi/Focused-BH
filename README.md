@@ -1,6 +1,6 @@
 # Focused BH
 
-A novel FDR-controlling method for hierarchically structured hypotheses that inputs any pre-specified filter and outputs a non-redundant rejection set with respect to that filter. 
+A novel FDR-controlling method for structured hypotheses that inputs any pre-specified filter and outputs a non-redundant rejection set with respect to that filter. 
 
 Accompanying paper:
 > *FDR control following filtering for hierarchically structured hypotheses* <br />
@@ -15,18 +15,12 @@ This repository provides software implementing Focused BH, as well as code to re
 
 ## Repository structure
 
-* [data/](https://github.com/ekatsevi/Focused-BH/tree/master/data): contains raw and processed data from the PheWAS analysis of the [UK Biobank](https://www.ukbiobank.ac.uk/) data[^1] and the GO enrichment analysis of the [breast cancer outcome data](https://www.ncbi.nlm.nih.gov/pubmed/11823860). 
+* [data/](https://github.com/ekatsevi/Focused-BH/tree/master/data): contains raw and processed data from the PheWAS analysis of the [UK Biobank](https://www.ukbiobank.ac.uk/) data<sup>1</sup> and the GO enrichment analysis of the [breast cancer outcome data](https://www.ncbi.nlm.nih.gov/pubmed/11823860). 
+* [precomp/](https://github.com/ekatsevi/Focused-BH/tree/master/precomp): contains precomputation results for our numerical simulations.
+* [results/](https://github.com/ekatsevi/Focused-BH/tree/master/results): contains final results for our numerical simulations.
+* [src/](https://github.com/ekatsevi/Focused-BH/tree/master/src): contains all source code for methodology, numerical simulations, data analysis, and plotting.
 
-[^1] Note that some of the UK Biobank data is not publicly accessible. 
-
-
-
-## Files 
-
-* FocusedBH.R:      implementation of Focused BH for the outer nodes filter
-* Test_FocusedBH.R: demonstrates the use of the Focused BH code
-* aux.R:            auxiliary functions (necessary only for Test_FocusedBH.R)
-* coding6.tsv:      tree-structured self-reported phenotype coding from UK Biobank
+<sup>1</sup> Note that our analysis of the UK Biobank data (application number 27837) is based on data fields [41202](https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=41202) (Diagnoses - main ICD10) and [22182](https://biobank.ctsu.ox.ac.uk/crystal/field.cgi?id=22182) (HLA imputation values), which are not publicly accessible. If you do not have access to these fields, we have provided summary statistics in [data/processed/biobank](https://github.com/ekatsevi/Focused-BH/tree/master/data/processed/biobank) so that the multiple testing portion of our analysis can be reproduced. If you do have access to these fields, place them into a comma-separated file called "ukb25261.csv" in the directory [data/raw/biobank](https://github.com/ekatsevi/Focused-BH/tree/master/data/raw/biobank) to reproduce our full data analysis.
 
 ## Author
 
