@@ -1,0 +1,258 @@
+method	metric	value	signal_strength	rep
+BH	power	0	1	34
+Focused_BH_original	power	0	1	34
+Focused_BH_permutation	power	0	1	34
+Structured_Holm	power	0	1	34
+BH	fdp	0	1	34
+Focused_BH_original	fdp	0	1	34
+Focused_BH_permutation	fdp	0	1	34
+Structured_Holm	fdp	0	1	34
+BH	power	0	1	144
+Focused_BH_original	power	0	1	144
+Focused_BH_permutation	power	0	1	144
+Structured_Holm	power	0	1	144
+BH	fdp	0	1	144
+Focused_BH_original	fdp	0	1	144
+Focused_BH_permutation	fdp	0	1	144
+Structured_Holm	fdp	0	1	144
+BH	power	0	1.5	4
+Focused_BH_original	power	0	1.5	4
+Focused_BH_permutation	power	0	1.5	4
+Structured_Holm	power	0	1.5	4
+BH	fdp	0	1.5	4
+Focused_BH_original	fdp	0	1.5	4
+Focused_BH_permutation	fdp	0	1.5	4
+Structured_Holm	fdp	0	1.5	4
+BH	power	0	1.5	114
+Focused_BH_original	power	0	1.5	114
+Focused_BH_permutation	power	0	1.5	114
+Structured_Holm	power	0	1.5	114
+BH	fdp	0	1.5	114
+Focused_BH_original	fdp	0	1.5	114
+Focused_BH_permutation	fdp	0	1.5	114
+Structured_Holm	fdp	0	1.5	114
+BH	power	0	1.5	224
+Focused_BH_original	power	0	1.5	224
+Focused_BH_permutation	power	0	1.5	224
+Structured_Holm	power	0	1.5	224
+BH	fdp	0	1.5	224
+Focused_BH_original	fdp	0	1.5	224
+Focused_BH_permutation	fdp	0	1.5	224
+Structured_Holm	fdp	0	1.5	224
+BH	power	0	2	84
+Focused_BH_original	power	0	2	84
+Focused_BH_permutation	power	0	2	84
+Structured_Holm	power	0	2	84
+BH	fdp	1	2	84
+Focused_BH_original	fdp	0	2	84
+Focused_BH_permutation	fdp	1	2	84
+Structured_Holm	fdp	0	2	84
+BH	power	0	2	194
+Focused_BH_original	power	0	2	194
+Focused_BH_permutation	power	0	2	194
+Structured_Holm	power	0	2	194
+BH	fdp	0	2	194
+Focused_BH_original	fdp	0	2	194
+Focused_BH_permutation	fdp	0	2	194
+Structured_Holm	fdp	0	2	194
+BH	power	0	2.5	54
+Focused_BH_original	power	0	2.5	54
+Focused_BH_permutation	power	0	2.5	54
+Structured_Holm	power	0	2.5	54
+BH	fdp	0	2.5	54
+Focused_BH_original	fdp	0	2.5	54
+Focused_BH_permutation	fdp	0	2.5	54
+Structured_Holm	fdp	0	2.5	54
+BH	power	0	2.5	164
+Focused_BH_original	power	0	2.5	164
+Focused_BH_permutation	power	0	2.5	164
+Structured_Holm	power	0	2.5	164
+BH	fdp	0	2.5	164
+Focused_BH_original	fdp	0	2.5	164
+Focused_BH_permutation	fdp	0	2.5	164
+Structured_Holm	fdp	0	2.5	164
+BH	power	5	3	24
+Focused_BH_original	power	2	3	24
+Focused_BH_permutation	power	5	3	24
+Structured_Holm	power	2	3	24
+BH	fdp	0	3	24
+Focused_BH_original	fdp	0	3	24
+Focused_BH_permutation	fdp	0	3	24
+Structured_Holm	fdp	0	3	24
+BH	power	10	3	134
+Focused_BH_original	power	7	3	134
+Focused_BH_permutation	power	7	3	134
+Structured_Holm	power	5	3	134
+BH	fdp	0.4444444444444444	3	134
+Focused_BH_original	fdp	0.3	3	134
+Focused_BH_permutation	fdp	0.4166666666666667	3	134
+Structured_Holm	fdp	0	3	134
+BH	power	8	3	244
+Focused_BH_original	power	8	3	244
+Focused_BH_permutation	power	8	3	244
+Structured_Holm	power	7	3	244
+BH	fdp	0.2	3	244
+Focused_BH_original	fdp	0	3	244
+Focused_BH_permutation	fdp	0	3	244
+Structured_Holm	fdp	0	3	244
+BH	power	8	3.5	104
+Focused_BH_original	power	7	3.5	104
+Focused_BH_permutation	power	8	3.5	104
+Structured_Holm	power	3	3.5	104
+BH	fdp	0	3.5	104
+Focused_BH_original	fdp	0	3.5	104
+Focused_BH_permutation	fdp	0	3.5	104
+Structured_Holm	fdp	0	3.5	104
+BH	power	0	3.5	214
+Focused_BH_original	power	0	3.5	214
+Focused_BH_permutation	power	0	3.5	214
+Structured_Holm	power	0	3.5	214
+BH	fdp	0	3.5	214
+Focused_BH_original	fdp	0	3.5	214
+Focused_BH_permutation	fdp	0	3.5	214
+Structured_Holm	fdp	0	3.5	214
+BH	power	11	4	74
+Focused_BH_original	power	9	4	74
+Focused_BH_permutation	power	11	4	74
+Structured_Holm	power	3	4	74
+BH	fdp	0.26666666666666666	4	74
+Focused_BH_original	fdp	0.18181818181818182	4	74
+Focused_BH_permutation	fdp	0.26666666666666666	4	74
+Structured_Holm	fdp	0	4	74
+BH	power	24	4	184
+Focused_BH_original	power	23	4	184
+Focused_BH_permutation	power	24	4	184
+Structured_Holm	power	19	4	184
+BH	fdp	0.07692307692307693	4	184
+Focused_BH_original	fdp	0.041666666666666664	4	184
+Focused_BH_permutation	fdp	0.04	4	184
+Structured_Holm	fdp	0	4	184
+BH	power	14	4.5	44
+Focused_BH_original	power	10	4.5	44
+Focused_BH_permutation	power	14	4.5	44
+Structured_Holm	power	4	4.5	44
+BH	fdp	0.2631578947368421	4.5	44
+Focused_BH_original	fdp	0	4.5	44
+Focused_BH_permutation	fdp	0.06666666666666667	4.5	44
+Structured_Holm	fdp	0	4.5	44
+BH	power	23	4.5	154
+Focused_BH_original	power	20	4.5	154
+Focused_BH_permutation	power	22	4.5	154
+Structured_Holm	power	10	4.5	154
+BH	fdp	0.20689655172413793	4.5	154
+Focused_BH_original	fdp	0.13043478260869565	4.5	154
+Focused_BH_permutation	fdp	0.12	4.5	154
+Structured_Holm	fdp	0	4.5	154
+BH	power	24	5	14
+Focused_BH_original	power	24	5	14
+Focused_BH_permutation	power	24	5	14
+Structured_Holm	power	24	5	14
+BH	fdp	0.14285714285714285	5	14
+Focused_BH_original	fdp	0	5	14
+Focused_BH_permutation	fdp	0	5	14
+Structured_Holm	fdp	0	5	14
+BH	power	27	5	124
+Focused_BH_original	power	27	5	124
+Focused_BH_permutation	power	27	5	124
+Structured_Holm	power	27	5	124
+BH	fdp	0.2702702702702703	5	124
+Focused_BH_original	fdp	0.03571428571428571	5	124
+Focused_BH_permutation	fdp	0.03571428571428571	5	124
+Structured_Holm	fdp	0	5	124
+BH	power	24	5	234
+Focused_BH_original	power	20	5	234
+Focused_BH_permutation	power	22	5	234
+Structured_Holm	power	13	5	234
+BH	fdp	0.14285714285714285	5	234
+Focused_BH_original	fdp	0.047619047619047616	5	234
+Focused_BH_permutation	fdp	0.08333333333333333	5	234
+Structured_Holm	fdp	0	5	234
+BH	power	28	5.5	94
+Focused_BH_original	power	27	5.5	94
+Focused_BH_permutation	power	28	5.5	94
+Structured_Holm	power	26	5.5	94
+BH	fdp	0.034482758620689655	5.5	94
+Focused_BH_original	fdp	0	5.5	94
+Focused_BH_permutation	fdp	0	5.5	94
+Structured_Holm	fdp	0	5.5	94
+BH	power	24	5.5	204
+Focused_BH_original	power	21	5.5	204
+Focused_BH_permutation	power	22	5.5	204
+Structured_Holm	power	13	5.5	204
+BH	fdp	0.14285714285714285	5.5	204
+Focused_BH_original	fdp	0	5.5	204
+Focused_BH_permutation	fdp	0.08333333333333333	5.5	204
+Structured_Holm	fdp	0	5.5	204
+BH	power	26	6	64
+Focused_BH_original	power	24	6	64
+Focused_BH_permutation	power	26	6	64
+Structured_Holm	power	22	6	64
+BH	fdp	0.2571428571428571	6	64
+Focused_BH_original	fdp	0.07692307692307693	6	64
+Focused_BH_permutation	fdp	0.10344827586206896	6	64
+Structured_Holm	fdp	0	6	64
+BH	power	28	6	174
+Focused_BH_original	power	28	6	174
+Focused_BH_permutation	power	28	6	174
+Structured_Holm	power	28	6	174
+BH	fdp	0.24324324324324326	6	174
+Focused_BH_original	fdp	0.034482758620689655	6	174
+Focused_BH_permutation	fdp	0.125	6	174
+Structured_Holm	fdp	0	6	174
+#
+#
+### FUNCTION CALL: ###
+# run_one_experiment(experiment_name = "GO_Simes", experiment_index = 34, base_dir = "/pylon5/ms5piap/ekatsevi/focused-bh")
+#
+#
+### VERSION CONTROL INFORMATION ###
+# | Author: ekatsevi <katsevich.gene@gmail.com>
+# | Date:   Mon Dec 30 12:00:49 2019 -0500
+# In Git repository Focused-BH-private, on branch master,
+# * commit 11c7ac8032c9367e5e9b41ad9afd218dd410377d (HEAD, origin/master, origin/HEAD, master)
+#
+#
+### R SESSION INFORMATION: ###
+# R version 3.6.0 (2019-04-26)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: CentOS Linux 7 (Core)
+# 
+# Matrix products: default
+# BLAS/LAPACK: /opt/intel/compilers_and_libraries_2019.3.199/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so
+# 
+# locale:
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+# [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+# [8] base     
+# 
+# other attached packages:
+#  [1] multtest_2.42.0     Biobase_2.46.0      BiocGenerics_0.32.0
+#  [4] Matrix_1.2-17       forcats_0.4.0       stringr_1.4.0      
+#  [7] dplyr_0.8.3         purrr_0.3.3         readr_1.3.1        
+# [10] tidyr_1.0.0         tibble_2.1.3        ggplot2_3.2.1      
+# [13] tidyverse_1.3.0     reshape2_1.4.3      R.utils_2.9.2      
+# [16] R.oo_1.23.0         R.methodsS3_1.7.1   ape_5.3            
+# [19] igraph_1.2.4.2      structSSI_1.1.1     cherry_0.6-13      
+# [22] qvalue_2.18.0       ontologyIndex_2.5   readxl_1.3.1       
+# 
+# loaded via a namespace (and not attached):
+#  [1] tidyselect_0.2.5  lpSolve_5.6.13.3  splines_3.6.0     haven_2.2.0      
+#  [5] lattice_0.20-38   colorspace_1.4-1  generics_0.0.2    vctrs_0.2.0      
+#  [9] stats4_3.6.0      survival_2.44-1.1 rlang_0.4.1       pillar_1.4.2     
+# [13] withr_2.1.2       glue_1.3.1        DBI_1.0.0         dbplyr_1.4.2     
+# [17] modelr_0.1.5      lifecycle_0.1.0   plyr_1.8.4        munsell_0.5.0    
+# [21] gtable_0.3.0      cellranger_1.1.0  rvest_0.3.5       broom_0.5.2      
+# [25] hommel_1.5        Rcpp_1.0.3        scales_1.1.0      backports_1.1.5  
+# [29] jsonlite_1.6      fs_1.3.1          hms_0.5.2         rjson_0.2.20     
+# [33] stringi_1.4.3     grid_3.6.0        cli_1.1.0         tools_3.6.0      
+# [37] bitops_1.0-6      magrittr_1.5      lazyeval_0.2.2    crayon_1.3.4     
+# [41] pkgconfig_2.0.3   zeallot_0.1.0     MASS_7.3-51.4     xml2_1.2.2       
+# [45] reprex_0.3.0      lubridate_1.7.4   rstudioapi_0.10   httr_1.4.1       
+# [49] assertthat_0.2.1  R6_2.4.1          nlme_3.1-140      compiler_3.6.0   

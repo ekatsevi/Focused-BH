@@ -13,10 +13,7 @@ if(length(args) > 0){
 
 # set base directory
 if(machine == "local"){
-  base_dir = "/home/ekatsevi/project-files/focused-bh"
-}
-if(machine == "PSC"){
-  base_dir="/pylon5/ms5piap/ekatsevi/focused-bh"
+  base_dir = ".."
 }
 
 # print base directory to standard out for bash script
@@ -25,7 +22,7 @@ if(length(args) > 0){
 }
 
 # set figures directory
-figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
+figures_dir = "../figures"
 
 # create directories if they don't exist
 directories = c(figures_dir,

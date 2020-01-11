@@ -1,0 +1,1 @@
+/share/godev/gofull/data/go/ontology/gene_ontology_edit.obo	/share/godev/gofull/data/go/ontology/gene_ontology_edit.obo	gene_ontology_edit.obo	file	c2ea6e5177508f925fcb244fd58ae877	1412153484	1412153364
