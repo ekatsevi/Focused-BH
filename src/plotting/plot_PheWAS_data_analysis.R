@@ -9,7 +9,7 @@ source("setup.R")
 # filenames
 rejections_filename = sprintf("%s/data/processed/biobank/PheWAS_rejections.tsv", base_dir)
 graph_filename = sprintf("%s/data/processed/biobank/G_at_least_50_cases.Rda", base_dir)
-HES_affected_file = sprintf("%s/data/raw/biobank/HES_affected.Rda", base_dir)
+HES_affected_file = sprintf("%s/data/processed/biobank/HES_affected.Rda", base_dir)
 tree_file = sprintf("%s/data/raw/biobank/coding19.tsv", base_dir)
 pvals_filename = sprintf("%s/data/processed/biobank/pvals_HES_B_2705_m50.tsv", base_dir)
 
@@ -98,6 +98,11 @@ df_rejections = df_rejections %>%
          category = root_short_meanings[G$node_names[root_nodes[node]]],
          P = P[node])
 
+# split rejections by category
+categories_with_rejections = df_rejections %>% 
+  filter(filter_status == "after_filter", rejected) %>% 
+  pull(category) %>% unique()
+
 df_rejections %>% 
   filter(filter_status == "after_filter", category %in% categories_with_rejections) %>% 
   group_by(method, category) %>% 
@@ -146,8 +151,6 @@ for(j in 1:G_to_plot$m){
   }
 }
 g<-graph(edges, n=G_to_plot$m, directed=TRUE)
-
-tree %>% filter(coding %in% G_to_plot$node_names) %>% pull(meaning)
 
 node_labels = rep("", G_to_plot$m)
 node_labels[FBH_rejections[nodes_to_plot]] = rank(P[musculoskeletal_nodes][FBH_rejections])

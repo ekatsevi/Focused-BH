@@ -2,7 +2,7 @@
 ontology_file = sprintf("%s/data/raw/GO/go-basic.obo", base_dir)
 annotations_file = sprintf("%s/data/raw/GO/goa_human.gaf", base_dir)
 gene_list_file = sprintf("%s/data/raw/GO/gene_list.txt", base_dir)
-older_terms_file = sprintf("%s/data/raw/GO/go_201410-termdb-tables/term.txt", base_dir)
+older_terms_file = sprintf("%s/data/raw/GO/term.txt", base_dir)
 
 ############# PROCESSED FILES ###################
 GO_graph_file = sprintf("%s/data/processed/GO/GO_graph.Rda", base_dir)

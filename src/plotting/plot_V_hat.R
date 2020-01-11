@@ -30,7 +30,7 @@ V_hat_permutation_GO = function(t){
 }
 
 # extract permutation V_hat for ICD/outer nodes experiment
-experiment_name = "PheWAS_Fisher"
+experiment_name = "PheWAS_intermediate"
 graph_file = sprintf("%s/data/processed/biobank/ICD_graph.Rda", base_dir)
 load(graph_file)
 m_PheWAS = G$m

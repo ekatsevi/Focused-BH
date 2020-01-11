@@ -13,7 +13,7 @@ if(length(args) > 0){
 
 # set base directory
 if(machine == "local"){
-  base_dir = "/home/ekatsevi/project-files/focused-bh"  
+  base_dir = "/home/ekatsevi/project-files/focused-bh"
 }
 if(machine == "PSC"){
   base_dir="/pylon5/ms5piap/ekatsevi/focused-bh"
@@ -27,3 +27,22 @@ if(length(args) > 0){
 # set figures directory
 figures_dir = "/home/ekatsevi/Dropbox/Research/Projects/HierTest/manuscript/Reresubmission/figures"
 
+# create directories if they don't exist
+directories = c(figures_dir,
+                base_dir, 
+                sprintf("%s/data", base_dir), 
+                sprintf("%s/data/raw", base_dir),
+                sprintf("%s/data/raw/GO", base_dir), 
+                sprintf("%s/data/raw/biobank", base_dir),
+                sprintf("%s/data/processed", base_dir),
+                sprintf("%s/data/processed/GO", base_dir),
+                sprintf("%s/data/processed/biobank", base_dir),
+                sprintf("%s/results", base_dir),
+                sprintf("%s/precomp", base_dir),
+                sprintf("%s/logs", base_dir))
+
+for(directory in directories){
+  if(!dir.exists(directory)){
+    dir.create(directory)
+  }
+}

@@ -24,27 +24,24 @@ parameters$experiment = 1:num_experiments
 # Input mode is one of {"experiment", "precomputation", 
 # "num_experiments", "num_precomputations"} and determines
 # how this script behaves
-if(exists("input_mode")){
-  stopifnot(input_mode %in% c("experiment", "precomputation"))
-  if(input_mode == "experiment"){
-    stopifnot(exists("experiment_index"))
-    parameters = parameters %>% dplyr::filter(experiment == experiment_index)
-  }
-  if(input_mode == "precomputation"){
-    stopifnot(exists("b"))
-  }
-} else{
+if(!exists("input_mode")){
   args = commandArgs(trailingOnly = TRUE)
   num_args = length(args)
   stopifnot(num_args == 1)
   input_mode = args[1]
-  stopifnot(input_mode %in% c("num_experiments", "num_precomputations"))
-  if(input_mode == "num_experiments"){
-    cat(num_experiments)
-  }
-  if(input_mode == "num_precomputations"){
-    cat(B)
-  }
+}
+if(input_mode == "experiment"){
+  stopifnot(exists("experiment_index"))
+  parameters = parameters %>% dplyr::filter(experiment == experiment_index)
+}
+if(input_mode == "precomputation"){
+  stopifnot(exists("b"))
+}
+if(input_mode == "num_experiments"){
+  cat(num_experiments)
+}
+if(input_mode == "num_precomputations"){
+  cat(B)
 }
 
 ######### DEFINE THE GRAPH AND NON-NULL STRUCTURE ###################

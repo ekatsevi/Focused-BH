@@ -26,15 +26,17 @@ HLA_split_file = sprintf("%s/data/processed/biobank/HLA_split.tsv", base_dir)
 # PheWAS p-values 
 pvals_filename = sprintf("%s/data/processed/biobank/pvals_HES_%s_m%d.tsv", base_dir, allele, min_affected)
 # reduced graph 
-reduced_graph_filename = sprintf("%s/data/processed/biobank/G_at_least_%d_cases.Rda", min_affected, base_dir)
+reduced_graph_filename = sprintf("%s/data/processed/biobank/G_at_least_%d_cases.Rda", base_dir, min_affected)
 # final sets of rejections for each method
 rejections_filename = sprintf("%s/data/processed/biobank/PheWAS_rejections.tsv", base_dir)
 
 ######### CREATE P-VALUES ###############
 if(!file.exists(pvals_filename)){
-  # read in HLA genotypes and number of cases per disease
-  HLA_split_df = read_tsv(HLA_split_file)
+  # read in processed data
+  HLA_split_df = read_tsv(HLA_split_file, col_types = cols(.default = col_double()))
   df_num_affected = read_tsv(num_affected_file, col_types = "ci")
+  load(HES_affected_file)
+  load(graph_file)
   
   # restrict attention to the allele of interest
   genotypes = round(HLA_split_df[[allele]])
@@ -46,7 +48,7 @@ if(!file.exists(pvals_filename)){
   P = numeric(m)
   P[num_affected < min_affected] = 1
   for(k in which(num_affected >= min_affected)){
-    affecteds = affected[[as.character(tree$node_id[k])]]
+    affecteds = affected[[as.character(G$info$node_ids[k])]]
     aff = c(sum(genotypes[affecteds] == 0, na.rm = TRUE), 
             sum(genotypes[affecteds] == 1, na.rm = TRUE), 
             sum(genotypes[affecteds] == 2, na.rm = TRUE))
@@ -142,4 +144,10 @@ if(!file.exists(rejections_filename)){
   
   # save to file
   write_tsv(df_rejections, rejections_filename)
+  
+  # add provenance information to output file
+  call_info = "#\n#\n### FUNCTION CALL: ###\n# source(\"PheWAS_data_analysis.R\")"
+  write(call_info, rejections_filename, append = TRUE)
+  add_git_info(rejections_filename)
+  add_R_session_info(rejections_filename)
 }

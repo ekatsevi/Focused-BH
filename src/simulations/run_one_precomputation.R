@@ -3,7 +3,7 @@ run_one_precomputation = function(experiment_name, experiment_index, base_dir){
   set.seed(1234+experiment_index) # for reproducibility; should be different for different experiment_index
   
   # set up all the simulation parameters
-  input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
+  input_filename = sprintf("simulations/input_files/input_file_%s.R", experiment_name)
   input_mode = "precomputation"
   source(input_filename, local = TRUE)
   

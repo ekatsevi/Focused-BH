@@ -4,7 +4,6 @@ suppressPackageStartupMessages(library(tidyverse))
 reps_per_experiment = 250              # repetitions per experiment
 reps = 250                             # total number of repetitions
 methods = c("BH",                      # methods to compare
-            "Leaf_BH",
             "Focused_BH_original",   
             "Yekutieli",
             "Structured_Holm")
@@ -24,27 +23,24 @@ parameters$experiment = 1:num_experiments
 # Input mode is one of {"experiment", "precomputation", 
 # "num_experiments", "num_precomputations"} and determines
 # how this script behaves
-if(exists("input_mode")){
-  stopifnot(input_mode %in% c("experiment", "precomputation"))
-  if(input_mode == "experiment"){
-    stopifnot(exists("experiment_index"))
-    parameters = parameters %>% dplyr::filter(experiment == experiment_index)
-  }
-  if(input_mode == "precomputation"){
-    stopifnot(exists("b"))
-  }
-} else{
+if(!exists("input_mode")){
   args = commandArgs(trailingOnly = TRUE)
   num_args = length(args)
   stopifnot(num_args == 1)
   input_mode = args[1]
-  stopifnot(input_mode %in% c("num_experiments", "num_precomputations"))
-  if(input_mode == "num_experiments"){
-    cat(num_experiments)
-  }
-  if(input_mode == "num_precomputations"){
-    cat(B)
-  }
+}
+if(input_mode == "experiment"){
+  stopifnot(exists("experiment_index"))
+  parameters = parameters %>% dplyr::filter(experiment == experiment_index)
+}
+if(input_mode == "precomputation"){
+  stopifnot(exists("b"))
+}
+if(input_mode == "num_experiments"){
+  cat(num_experiments)
+}
+if(input_mode == "num_precomputations"){
+  cat(B)
 }
 
 ######### DEFINE THE GRAPH AND NON-NULL STRUCTURE ###################
@@ -52,6 +48,7 @@ if(input_mode %in% c("precomputation", "experiment")){
   # read in GO data
   graph_file = sprintf("%s/data/processed/biobank/ICD_graph.Rda", base_dir)
   load(graph_file)
+  
   
   # create adjacency matrix between genes and GO terms
   num_items = G$num_items
@@ -76,9 +73,15 @@ if(input_mode %in% c("precomputation", "experiment")){
   #   adj_matrix[items_in_node, node] = TRUE
   # }
   
-  # sample 50 "anchor nodes" (ICD terms) that are leaves
+  # sample 10 "anchor nodes" (ICD codes) with 5 items each, in different subtrees
+  node_depths = get_depths(G$Pa)
   leaves = sapply(G$C, length) == 0
-  anchor_nodes = withSeed(sample(which(leaves), 50),1)
+  num_leaves = get_num_marked_descendants(G$C,  leaves)
+  root_nodes = get_root_nodes(G$Pa)
+  roots = which(node_depths == 1)
+  nonnull_roots = withSeed(sample(roots, 10),1)
+  anchor_nodes = unlist(sapply(nonnull_roots, 
+                               function(nonnull_root)(withSeed(sample(which(root_nodes == nonnull_root & num_leaves == 5),1),1))))
   
   # define the genes belonging to the anchor terms non-null
   nonnull_items = unlist(G$sets[anchor_nodes])

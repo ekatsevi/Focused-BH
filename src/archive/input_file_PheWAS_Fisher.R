@@ -98,13 +98,6 @@ if(input_mode %in% c("precomputation", "experiment")){
   nonnull_items = unique(unlist(lapply(G$sets[anchor_nodes], 
                                        function(set)(withSeed(sample(set, 5),1)))))
   
-  # for(anchor_node in anchor_nodes){
-  #   cat(sprintf("ANCHOR NODE\n"))
-  #   for(node in G$C[[anchor_node]]){
-  #     cat(sprintf("%d out of %d are non-null.\n", length(intersect(G$sets[[node]], nonnull_items)), length(G$sets[[node]])))
-  #   }
-  # }
-  
   # deduce which other GO terms are non-null
   nonnull_nodes = colSums(adj_matrix[nonnull_items,]) > 0
 }

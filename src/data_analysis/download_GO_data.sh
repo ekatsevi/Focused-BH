@@ -25,7 +25,7 @@ fi
 
 if test ! -f $gene_list_file; then
     echo "Downloading Van't'veer gene list..."
-    wget http://cbl-gorilla.cs.technion.ac.il/VantVeerMoreLess5.txt -P $data_dir -O gene_list.txt
+    wget http://cbl-gorilla.cs.technion.ac.il/VantVeerMoreLess5.txt -P $data_dir -O $data_dir/gene_list.txt
 fi
 
 # echo "Download complete."

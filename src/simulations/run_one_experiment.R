@@ -1,7 +1,7 @@
 # run one experiment
 run_one_experiment = function(experiment_name, experiment_index, base_dir){
   # set up all the simulation parameters
-  input_filename = sprintf("input_files/input_file_%s.R", experiment_name)
+  input_filename = sprintf("simulations/input_files/input_file_%s.R", experiment_name)
   input_mode = "experiment"
   source(input_filename, local = TRUE)
   
@@ -22,7 +22,7 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     stopifnot(B > 0)
     null_V_hats = vector("list", B)
     for(b in 1:B){
-      precomp_filename = sprintf("%s/precomp/%s/%s",base_dir, experiment_name, precomp_files[b])
+      precomp_filename = sprintf("%s/precomp/%s/%s", base_dir, experiment_name, precomp_files[b])
       V_hat = read_tsv(precomp_filename, comment = "#")
       V_hat$b = b
       null_V_hats[[b]] = V_hat %>% filter(pvalue <= q)
@@ -41,7 +41,6 @@ run_one_experiment = function(experiment_name, experiment_index, base_dir){
     depths = get_depths(G$Pa)
     q_Yekutieli = q/(2*max(depths)) # corrected FDR target level based on 
                                     # Proposition 1 of Yekutieli (2008)
-    
   }
   
   # run all methods for each setting of parameters 

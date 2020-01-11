@@ -57,7 +57,7 @@ if(!file.exists(graph_file)){
   
   # index the leaf nodes and assign leaf nodes
   # to their ICD-10 codes
-  item_index = integer(G$num_items)
+  item_index = integer(num_items)
   item_index[leaves] = 1:num_items
   sets = vector("list", m)
   for(node in 1:m){
@@ -75,6 +75,9 @@ if(!file.exists(graph_file)){
   G$sets = sets
   G$node_names = node_names
   G$item_names = item_names
+  G$info = c()
+  G$info$node_meanings = tree$meaning
+  G$info$node_ids = tree$node_id
   
   # convert graph to Structured Holm and Yekutieli formats
   G_SH = new("DAGstructure", parents = G$Pa, children = G$C, sets = G$sets, twoway = FALSE)
@@ -85,7 +88,9 @@ if(!file.exists(graph_file)){
 }
 
 ############# EXTRACT DISEASES AND HLA GENOTYPES ###################
-if(!file.exists(disease_file) | !file.exists(HLA_file)){
+if((!file.exists(disease_file) | !file.exists(HLA_file)) & file.exists(phen_file)){
+  cat(sprintf("Parsing raw phenotype file...\n"))
+  
   # read in the raw phenotype file
   phenotypes_raw = read_csv(phen_file, guess_max=500000)
   
@@ -101,7 +106,9 @@ if(!file.exists(disease_file) | !file.exists(HLA_file)){
 }
 
 ############# PARSE DISEASE INFORMATION ###################
-if(!file.exists(HES_affected_file)){
+if(!file.exists(HES_affected_file) & file.exists(disease_file)){
+  cat(sprintf("Parsing disease information (this will take a minute or two)...\n"))
+  
   # read in disease information and tree
   HES = read_tsv(disease_file, col_types = cols(.default = col_character()))
   tree = read_tsv(tree_file, col_types = c("cciic"))
@@ -116,7 +123,7 @@ if(!file.exists(HES_affected_file)){
   names(affected) = diseases
   for(i in 1:n){
     if(i %% 10000 == 0){
-      print(i)
+      cat(sprintf("Working on individual %d of %d...\n", i, n))
     }
     for(j in 1:p){
       disease = HES[i,j]
@@ -162,10 +169,12 @@ if(!file.exists(HES_affected_file)){
 }
 
 ############# PARSE HLA INFORMATION ###################
-if(!file.exists(HLA_split_file)){
+if(!file.exists(HLA_split_file) & file.exists(HLA_file)){
+  cat(sprintf("Parsing HLA information (this will take a minute or two)...\n"))
+  
   # read HLA data
-  HLA = read_tsv(HLA_file)
-  HLA_names = read_tsv(allele_file, col_names = FALSE) %>% pull()
+  HLA = read_tsv(HLA_file, col_types = "c")
+  HLA_names = read_tsv(allele_file, col_names = FALSE, col_types = "c") %>% pull()
   
   # split the genotypes for each individual
   n = nrow(HLA)
@@ -173,7 +182,7 @@ if(!file.exists(HLA_split_file)){
   HLA_split = matrix(0, n, p)
   for(i in 1:n){
     if(i %% 10000 == 0){
-      print(i)
+      cat(sprintf("Working on individual %d of %d...\n", i, n))    
     }
     HLA_split[i,] = as.numeric(strsplit(HLA$f.22182.0.0[i], split = ",")[[1]])
   }

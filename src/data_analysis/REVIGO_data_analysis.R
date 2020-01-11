@@ -28,7 +28,7 @@ if(!file.exists(rejections_filename)){
   m = G$m
   P = rep(1, m)
   significant_ids = match(GO$`GO Term`, ids)
-  cat(sprintf("%d out of %d of the significant GO terms are not in the older ontology.\n", 
+  cat(sprintf("%d out of %d of the significant GO terms are not in the older ontology available to REVIGO.\n", 
               sum(is.na(significant_ids)), length(significant_ids)))
   P[significant_ids[!is.na(significant_ids)]] = GO$`P-value`[!is.na(significant_ids)]
   names(P) = ids
@@ -68,5 +68,11 @@ if(!file.exists(rejections_filename)){
   df_rejections = as_tibble(df_rejections) %>% mutate(node = as.character(node))
   
   # save results to file
-  write_tsv(df_rejections, rejections_filename) 
+  write_tsv(df_rejections, rejections_filename)
+  
+  # add provenance information to output file
+  call_info = "#\n#\n### FUNCTION CALL: ###\n# source(\"REVIGO_data_analysis.R\")"
+  write(call_info, rejections_filename, append = TRUE)
+  add_git_info(rejections_filename)
+  add_R_session_info(rejections_filename)
 }

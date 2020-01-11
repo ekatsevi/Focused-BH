@@ -5,7 +5,6 @@ source("methodology/utils_DAG.R")
 source("simulations/run_one_experiment.R")
 source("simulations/run_one_precomputation.R")
 source("utils/utils_provenance.R")
-source("utils/utils_setup.R")
 
 # load libraries
 load_silently = function(packages){
@@ -20,11 +19,11 @@ load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry",
                 "janitor", "VennDiagram", "tidyverse"))
 
 # set paths
-source("utils/set_base_dir.R")
+source("utils/set_paths.R")
   
 # download data, if not already done
-system(sprintf("./download_GO_data.sh %s", base_dir))
+system(sprintf("./data_analysis/download_GO_data.sh %s", base_dir))
 
 # parse GO and UKBB data, if not already done
-source("parse_GO_data.R")
-source("parse_UKBB_data.R")
+source("data_analysis/parse_GO_data.R")
+source("data_analysis/parse_UKBB_data.R")
