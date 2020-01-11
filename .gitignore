@@ -3,3 +3,4 @@ src/archive/*
 .Rhistory
 .RData
 TBD.txt
+*.html
