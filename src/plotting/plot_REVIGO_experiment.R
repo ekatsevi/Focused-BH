@@ -21,26 +21,31 @@ for(index in 1:length(results_files)){
 
 # massage results into a data frame, rename some column entries
 df_results = do.call("rbind", results)
-df_results = df_results %>% mutate(method = factor(method, 
-                                                   levels = c("BH", 
-                                                              "Focused_BH_original", 
-                                                              "Focused_BH_permutation",
-                                                              "Structured_Holm"),
-                                                   labels = c("BH", 
-                                                              "Focused BH", 
-                                                              "Focused BH (permutation)",
-                                                              "Structured Holm")),
-                                   metric = factor(metric, 
-                                                   levels = c("fdp", "power"), 
-                                                   labels = c("False discovery rate", "Number of true discoveries"))) %>%
+df_results = df_results %>% 
+  filter(method != "BH") %>%
   group_by(method, metric, signal_strength) %>%
-  summarise(value_mean = mean(value), value_se = sd(value)/sqrt(n()))
+  summarise(value_mean = mean(value), value_se = sd(value)/sqrt(n())) %>%
+  ungroup() %>%
+  group_by(metric) %>%
+  mutate(value_mean = ifelse(metric == "power", value_mean/max(value_mean), value_mean)) %>%
+  ungroup() %>%
+  mutate(method = factor(method, 
+                         levels = c("Focused_BH_original", 
+                                    "Focused_BH_permutation",
+                                    "Structured_Holm"),
+                         labels = c("Focused BH", 
+                                    "Focused BH (permutation)",
+                                    "Structured Holm")),
+         metric = factor(metric, 
+                         levels = c("fdp", "power"),
+                         labels = c("False discovery rate", "Power")))
+  
 
 # plot the results and save to file
 p = df_results %>% filter(signal_strength <= 6) %>%
   ggplot(aes(x = signal_strength, y = value_mean, group = method, colour = method)) + 
   geom_line() + geom_point() + 
-  scale_colour_manual(values = c("firebrick1", "dodgerblue", "blue", "darkorange2")) + 
+  scale_colour_manual(values = c("dodgerblue", "blue", "darkorange2")) + 
   geom_hline(data = tibble(metric = "False discovery rate", q = 0.1), 
              aes(yintercept = q), linetype = "dashed") + 
   geom_errorbar(data = df_results %>% filter(metric == "False discovery rate", signal_strength <= 6),

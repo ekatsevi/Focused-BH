@@ -35,7 +35,7 @@ for(experiment_idx in 1:length(experiment_names)){
 df_results_all = do.call("rbind", results_all)
 
 df_results_all = df_results_all %>% 
-  filter(method %in% c("Focused_BH_original", "BH", "Leaf_BH_1", "Leaf_BH_2", "Leaf_BH_3")) %>%
+  filter(method %in% c("Focused_BH_original", "Focused_BH_permutation",  "BH", "Leaf_BH_1", "Leaf_BH_2", "Leaf_BH_3")) %>%
   group_by(experiment, metric, method, signal_strength) %>%
   summarise(value_mean = mean(value), value_se = sd(value)/sqrt(n())) %>% 
   ungroup() %>%
@@ -44,11 +44,13 @@ df_results_all = df_results_all %>%
   ungroup() %>% 
   mutate(method = factor(method, 
                          levels = c("Focused_BH_original", 
+                                    "Focused_BH_permutation",
                                     "BH",
                                     "Leaf_BH_1",
                                     "Leaf_BH_2",
                                     "Leaf_BH_3"),
                          labels = c("Focused BH",
+                                    "Focused BH (permutation)",
                                     "BH (all nodes)",
                                     "BH (height 1)",
                                     "BH (height 2)",
@@ -69,7 +71,7 @@ p = df_results_all %>% filter(signal_strength <= 6) %>% arrange(desc(method)) %>
                 aes(ymin = value_mean - 2*value_se, ymax = value_mean + 2*value_se), 
                 width = 0.2) + 
   facet_grid(metric ~ experiment, scales = "free_y") +
-  scale_colour_manual(values = c("dodgerblue", "firebrick1", "gold2", "goldenrod3", "goldenrod4")) + 
+  scale_colour_manual(values = c("dodgerblue", "blue", "firebrick1", "gold2", "goldenrod3", "goldenrod4")) + 
   guides(colour = guide_legend(nrow = 2, byrow = FALSE)) + 
   # scale_linetype_manual(values = c("solid", "longdash", "dotdash", "dashed")) + 
   theme_bw() + xlab("Signal strength") + ylab("Number of Power") +
