@@ -57,8 +57,8 @@ source("data_analysis/REVIGO_data_analysis.R")
 # plot figures for numerical simulations
 source("plotting/plot_V_hat.R")
 source("plotting/plot_PheWAS_experiment.R")
-source("plotting/plot_PheWAS_experiment_BH_levels.R")
 source("plotting/plot_REVIGO_experiment.R")
+source("plotting/plot_BH_figure.R")
 
 # plot figures for data analyses
 source("plotting/plot_PheWAS_data_analysis.R")

@@ -16,7 +16,7 @@ load_silently = function(packages){
 load_silently(c("readxl", "ontologyIndex", "qvalue", "cherry", 
                 "structSSI", "igraph", "ape", "R.utils", "reshape2", 
                 "Matrix", "multtest", "ggraph", "kableExtra",
-                "janitor", "VennDiagram", "tidyverse", "gridExtra"))
+                "janitor", "VennDiagram", "gridExtra", "tidyverse"))
 
 # set paths
 source("utils/set_paths.R")
