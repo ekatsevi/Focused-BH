@@ -42,6 +42,7 @@ The following R (version 3.6.2) packages are required:
 * kableExtra 1.1.0
 * janitor 1.2.0
 * VennDiagram 1.6.20
+* gridExtra 2.3
 * tidyverse 1.2.1
 
 The code was testing using the R and package versions above, though later version should be compatible as well.
