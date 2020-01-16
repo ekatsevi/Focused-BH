@@ -61,7 +61,7 @@ df = tibble(t,
 p = df %>% gather(estimate, V_hat, -t) %>%
   mutate(estimate = factor(estimate, 
                            levels = c("V_hat_original", "V_hat_PheWAS", "V_hat_GO"),
-                           labels = c("Original", "Permutation (ICD)", "Permutation (GO)"))) %>%
+                           labels = c("Original", "Resampling (ICD)", "Resampling (GO)"))) %>%
   ggplot(aes(x = t, y = V_hat, group = estimate, colour = estimate, linetype = estimate)) +
   scale_colour_manual(values = c("dodgerblue", "blue", "blue")) + 
   scale_linetype_manual(values = c("solid", "longdash", "dotdash")) + 
