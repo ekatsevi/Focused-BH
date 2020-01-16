@@ -52,7 +52,7 @@ p_items = df_all %>%
         )
 plot(p_items)
 
-p_combined = grid.arrange(p_nodes, p_items, ncol = 2)
+p_combined = grid.arrange(p_nodes, p_items, ncol = 2) #, top = textGrob("ICD graph for simulation",gp=gpar(fontsize=14)))
 
 plot_filename = sprintf("%s/ICD_simulation_graph_info.pdf", figures_dir)
 ggsave(filename = plot_filename, plot = p_combined, device = "pdf", width = 8, height = 3)
@@ -101,7 +101,7 @@ p_items = df %>%
         )
 plot(p_items)
 
-p_combined = grid.arrange(p_nodes, p_items, ncol = 2)
+p_combined = grid.arrange(p_nodes, p_items, ncol = 2)#, top = textGrob("GO graph for simulation",gp=gpar(fontsize=14)))
 
 plot_filename = sprintf("%s/REVIGO_experiment_graph_info.pdf", figures_dir)
 ggsave(filename = plot_filename, plot = p_combined, device = "pdf", width = 8, height = 3)
